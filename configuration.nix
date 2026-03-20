@@ -75,6 +75,12 @@
   };
 
   # programs.firefox.enable = true;
+  hardware.graphics.enable = true; # Required for GPU access
+  hardware.amdgpu.opencl.enable = true;
+  hardware.opengl.enable = true;
+  # hardware.opengl.extraPackages = [ pkgs.rocm-opencl-icd ];
+
+  programs.nix-ld.enable = true;
 
   # List packages installed in system profile.
   # You can use https://search.nixos.org/ to find more packages (and options).
@@ -86,13 +92,24 @@
     ripgrep
     fd
     zellij
-    zoxide
     fzf
     telegram-desktop
     brightnessctl    
     ungoogled-chromium
     lazygit
+    rocmPackages.clr
+    rocmPackages.hipblas
+    btop
+    stdenv.cc.cc.lib
+    glibc
+    nix-index
   ];
+
+  services.v2raya.enable = true;
+  programs.zsh.enable = true;
+  users.defaultUserShell = pkgs.zsh;
+  environment.shells = with pkgs; [ zsh ];
+
 
   fonts.packages = with pkgs; [
     nerd-fonts.jetbrains-mono
