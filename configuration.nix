@@ -18,8 +18,6 @@
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
   networking.hostName = "nixos-btw"; # Define your hostname.
-
-  # Configure network connections interactively with nmcli or nmtui.
   networking.networkmanager.enable = true;
 
   # Set your time zone.
@@ -85,8 +83,10 @@
   # List packages installed in system profile.
   # You can use https://search.nixos.org/ to find more packages (and options).
   environment.systemPackages = with pkgs; [
-    vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    vim
+    neovim
     wget
+    aria2
     git
     alacritty
     ripgrep
@@ -103,7 +103,10 @@
     stdenv.cc.cc.lib
     glibc
     nix-index
+    xclip
+    redshift
   ];
+
 
   services.v2raya.enable = true;
   programs.zsh.enable = true;
@@ -114,6 +117,8 @@
   fonts.packages = with pkgs; [
     nerd-fonts.jetbrains-mono
   ];
+
+  networking.wg-quick.interfaces.lithuania.configFile = "/etc/nixos/files/wireguard/lithuania.conf";
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 

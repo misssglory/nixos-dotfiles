@@ -1,6 +1,9 @@
 { config, pkgs, ... }:
 
 {
+  imports = [
+#    ./modules/neovim.nix
+  ];
   home.username = "mg";
   home.homeDirectory = "/home/mg";
 
@@ -120,6 +123,10 @@
   # you can later add something like:
   # xdg.configFile."p10k/p10k.zsh".source = ./p10k.zsh;
 
+  home.packages = [
+   # pkgs.xclip
+  ];
+
   # --------------------------------------------------
   # Alacritty configuration
   # --------------------------------------------------
@@ -182,6 +189,10 @@
   # --------------------------------------------------
   programs.bash = {
     enable = true;
+  };
+  xdg.configFile."nvim" = {
+      source = config.lib.file.mkOutOfStoreSymlink "/home/tony/nixos-dotfiles/config/nvim";
+      recursive = true;
   };
 
   home.stateVersion = "25.11";

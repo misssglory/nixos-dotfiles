@@ -13,6 +13,7 @@
       modules = [
         ./configuration.nix
         home-manager.nixosModules.home-manager
+#	(import ./modules/proxy/default.nix)
         {
           home-manager = {
             useGlobalPkgs = true;
