@@ -45,6 +45,17 @@
   };
   services.displayManager.ly.enable = true;
 
+# Enable Podman in configuration.nix
+virtualisation.podman = {
+  enable = true;
+  # Create the default bridge network for podman
+  defaultNetwork.settings.dns_enabled = true;
+};
+
+# Optionally, create a Docker compatibility alias
+#programs.zsh.shellAliases = {
+#  docker = "podman";
+#};
   # Configure keymap in X11
   # services.xserver.xkb.layout = "us";
   # services.xserver.xkb.options = "eurosign:e,caps:escape";
@@ -107,18 +118,18 @@
     redshift
   ];
 
-
-  services.v2raya.enable = true;
   programs.zsh.enable = true;
   users.defaultUserShell = pkgs.zsh;
   environment.shells = with pkgs; [ zsh ];
-
 
   fonts.packages = with pkgs; [
     nerd-fonts.jetbrains-mono
   ];
 
-  networking.wg-quick.interfaces.lithuania.configFile = "/etc/nixos/files/wireguard/lithuania.conf";
+  networking.wg-quick.interfaces.lithuania = {
+    configFile = "/etc/nixos/files/wireguard/lithuania.conf";
+    autostart = false;
+  };
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
@@ -130,21 +141,13 @@
   #   enableSSHSupport = true;
   # };
 
-  # List services that you want to enable:
-
-  # Enable the OpenSSH daemon.
-  # services.openssh.enable = true;
-
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
+  services.openssh.enable = true;
+  networking.firewall.enable = false;
 
   # Copy the NixOS configuration file and link it from the resulting system
   # (/run/current-system/configuration.nix). This is useful in case you
   # accidentally delete configuration.nix.
-  # system.copySystemConfiguration = true;
+  # system.copySystemConfiguration = true#;
 
   # This option defines the first version of NixOS you have installed on this particular machine,
   # and is used to maintain compatibility with application data (e.g. databases) created on older NixOS versions.
@@ -163,7 +166,6 @@
   # and migrated your data accordingly.
   #
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
-  system.stateVersion = "25.11"; # Did you read the comment?
-
+  system.stateVersion = "25.11"; # Did you read the comment3?
 }
 
