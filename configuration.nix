@@ -35,15 +35,29 @@
   #   useXkbConfig = true; # use xkb.options in tty.
   # };
 
-  # Enable the X11 windowing system.
-  # services.xserver.enable = true;
+  # X11 and Wayland setup
+  # Enable X11 server for XWayland compatibility only
   services.xserver = {
-    enable = true;
-    autoRepeatDelay = 200;
-    autoRepeatInterval = 35;
-    windowManager.i3.enable = true;
+    enable = true;  # Required for XWayland
+    # Disable X11 window managers since we're using Wayland
+    # autoRepeatDelay = 200;
+    # autoRepeatInterval = 35;
+    # windowManager.i3.enable = true; # Disable i3 when using dwl
   };
+  
+  # Enable display manager (ly supports both X11 and Wayland)
   services.displayManager.ly.enable = true;
+  
+  # Optional: Enable other display managers if needed
+  # services.displayManager.sddm.enable = true;
+  # services.displayManager.sddm.wayland.enable = true;
+
+  # Enable seat management for Wayland
+  services.seatd.enable = true;
+  
+  # Configure XWayland
+  # No need to set services.xserver.enable again - it's already set above
+  # services.xserver.displayManager.gdm.wayland = false; # Remove this unless using GDM
 
 # Enable Podman in configuration.nix
 virtualisation.podman = {
@@ -63,21 +77,25 @@ virtualisation.podman = {
   # Enable CUPS to print documents.
   # services.printing.enable = true;
 
-  # Enable sound.
+  # Enable sound with PipeWire (Wayland-friendly)
   # services.pulseaudio.enable = true;
   # OR
-  # services.pipewire = {
-  #   enable = true;
-  #   pulse.enable = true;
-  # };
+  services.pipewire = {
+    enable = true;
+    pulse.enable = true;
+    # Enable JACK if needed
+    jack.enable = true;
+  };
 
   # Enable touchpad support (enabled default in most desktopManager).
   # services.libinput.enable = true;
+  # Enable libinput for touchpad support in Wayland
+  services.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.mg = {
     isNormalUser = true;
-    extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
+    extraGroups = [ "wheel" "video" "input" "seat" ]; # Add needed groups for Wayland
     packages = with pkgs; [
       tree
     ];
@@ -114,8 +132,18 @@ virtualisation.podman = {
     stdenv.cc.cc.lib
     glibc
     nix-index
-    xclip
-    redshift
+    # xclip - Replace with Wayland clipboard tools
+    wl-clipboard  # Wayland clipboard utility
+    # Additional Wayland utilities
+    grim          # Screenshot utility for Wayland
+    slurp         # Region selection for Wayland
+    swaybg        # Wallpaper utility for Wayland
+    waybar        # Status bar for Wayland
+    mako          # Notification daemon for Wayland
+    wmenu         # Application launcher for Wayland (dmenu replacement)
+    foot          # Terminal emulator for Wayland
+    # redshift - Use wlsunset for Wayland instead
+    wlsunset      # Day/night gamma adjustments for Wayland
   ];
 
   programs.zsh.enable = true;
@@ -168,4 +196,3 @@ virtualisation.podman = {
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
   system.stateVersion = "25.11"; # Did you read the comment3?
 }
-

@@ -7,26 +7,42 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     dwl = {
-      url = "github:misssglory/dwl-setup";
+      url = "github:misssglory/dwl-setup/my-dwl";
+      flake = false;
     };
   };
-  outputs = { self, nixpkgs, home-manager, dwl, ... }: {
-    nixosConfigurations.nixos-btw = nixpkgs.lib.nixosSystem {
+  outputs = { self, nixpkgs, home-manager, dwl, ... }: 
+    let
       system = "x86_64-linux";
-      modules = [
-        ./configuration.nix
-        home-manager.nixosModules.home-manager
-#	(import ./modules/proxy/default.nix)
-        {
-          home-manager = {
-            useGlobalPkgs = true;
-            useUserPackages = true;
-            users.mg = import ./home.nix;
-            backupFileExtension = "backup";
-          };
-        }
-      ];
+      pkgs = nixpkgs.legacyPackages.${system};
+      
+      # Use wlroots 0.18 explicitly
+      wlroots = pkgs.wlroots_0_18;
+    in {
+      packages.${system}.dwl = pkgs.callPackage ./dwl.nix {
+        src = dwl;
+        inherit wlroots;
+        xorg = pkgs.xorg;
+        libxkbcommon = pkgs.libxkbcommon;
+        pixman = pkgs.pixman;
+      };
+      
+      nixosConfigurations.nixos-btw = nixpkgs.lib.nixosSystem {
+        inherit system;
+        modules = [
+          ./configuration.nix
+          home-manager.nixosModules.home-manager
+          {
+            environment.systemPackages = [ self.packages.${system}.dwl ];
+            
+            home-manager = {
+              useGlobalPkgs = true;
+              useUserPackages = true;
+              users.mg = import ./home.nix;
+              backupFileExtension = "backup";
+            };
+          }
+        ];
+      };
     };
-  };
 }
-
