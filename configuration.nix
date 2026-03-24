@@ -123,7 +123,7 @@ virtualisation.podman = {
     zellij
     fzf
     telegram-desktop
-    brightnessctl    
+    light
     ungoogled-chromium
     lazygit
     rocmPackages.clr
@@ -132,9 +132,7 @@ virtualisation.podman = {
     stdenv.cc.cc.lib
     glibc
     nix-index
-    # xclip - Replace with Wayland clipboard tools
     wl-clipboard  # Wayland clipboard utility
-    # Additional Wayland utilities
     grim          # Screenshot utility for Wayland
     slurp         # Region selection for Wayland
     swaybg        # Wallpaper utility for Wayland
@@ -142,8 +140,8 @@ virtualisation.podman = {
     mako          # Notification daemon for Wayland
     wmenu         # Application launcher for Wayland (dmenu replacement)
     foot          # Terminal emulator for Wayland
-    # redshift - Use wlsunset for Wayland instead
     wlsunset      # Day/night gamma adjustments for Wayland
+    fuzzel
   ];
 
   programs.zsh.enable = true;

@@ -437,7 +437,6 @@
     wlsunset         # Day/night color temperature (redshift replacement)
     
     # System utilities
-    brightnessctl    # Brightness control
     pavucontrol      # Audio control
     networkmanagerapplet  # Network manager applet
     

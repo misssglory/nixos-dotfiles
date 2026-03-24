@@ -7,7 +7,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     dwl = {
-      url = "github:misssglory/dwl-setup/my-dwl";
+      url = "github:misssglory/dwl-setup/7d355da52dbca82affe36c8254a249d6695094d5";
       flake = false;
     };
   };
