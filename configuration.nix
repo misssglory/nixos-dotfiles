@@ -142,6 +142,7 @@ virtualisation.podman = {
     foot          # Terminal emulator for Wayland
     wlsunset      # Day/night gamma adjustments for Wayland
     fuzzel
+    criu
   ];
 
   programs.zsh.enable = true;
@@ -159,6 +160,14 @@ virtualisation.podman = {
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
+  security.wrappers = {
+    criu = {
+      source = "${pkgs.criu}/bin/criu";
+      capabilities = "cap_checkpoint_restore+ep";
+      owner = "root";
+      group = "root";
+    };
+  };
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
