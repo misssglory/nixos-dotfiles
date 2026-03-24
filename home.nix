@@ -68,6 +68,9 @@
     ];
   };
 
+  # --------------------------------------------------
+  # Systemd user services for Wayland components
+  # --------------------------------------------------
   systemd.user.services = {
     waybar = {
       Unit = {
@@ -122,43 +125,33 @@
   systemd.user.targets.graphical-session = {
     Unit = {
       Description = "Graphical session";
-      Wants = [ "waybar.service" "mako.service" 
-      # "swaybg.service" 
-      ];
+      Wants = [ "waybar.service" "mako.service" ];
     };
   };
 
+  # --------------------------------------------------
+  # Zsh configuration
+  # --------------------------------------------------
   programs.zsh = {
     enable = true;
     enableCompletion = true;
-    autosuggestion.enable = true;      # zsh-autosuggestions
-    syntaxHighlighting.enable = true;  # zsh-syntax-highlighting
+    autosuggestion.enable = true;
+    syntaxHighlighting.enable = true;
 
-    # Oh My Zsh for plugins like git and fzf-zsh-plugin
     oh-my-zsh = {
       enable = true;
-      # Basic plugins list; fzf-zsh-plugin is provided separately below
       plugins = [ "git" ];
-      # You can set another theme here, but Powerlevel10k will override prompt
       theme = "robbyrussell";
     };
 
-    # Additional, non-oh-my-zsh plugins such as fzf-zsh-plugin
     plugins = [
       {
         name = "fzf-zsh-plugin";
-        src = pkgs.zsh-fzf-tab; # or another fzf-related plugin you prefer
+        src = pkgs.zsh-fzf-tab;
         file = "share/fzf-tab/fzf-tab.plugin.zsh";
       }
     ];
 
-    # Make zsh your login shell when using Home Manager
-    # (applies to new shells; you may still want `chsh` once manually)
-    #loginShellInit = ''
-    #  export SHELL=${pkgs.zsh}/bin/zsh
-    #'';
-
-    # Load Powerlevel10k theme
     initExtraBeforeCompInit = ''
       # Powerlevel10k theme
       if [ -f "${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k/powerlevel10k.zsh-theme" ]; then
@@ -166,12 +159,11 @@
       fi
     '';
 
-    # Put your p10k config here, or source a separate file
     initExtra = ''
       # If you generated ~/.p10k.zsh once, you can have HM manage it as a dotfile.
       [[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
 
-      # zoxide keybindings (example)
+      # zoxide keybindings
       eval "$(zoxide init zsh)"
       
       # Wayland environment variables
@@ -184,7 +176,6 @@
       
       # Automatically start dwl on tty1 if not already in a session
       if [ -z "$WAYLAND_DISPLAY" ] && [ -z "$DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
-       # exec ~/.config/dwl/autostart.sh
         systemctl --user start graphical-session.target
         exec dwl
       fi
@@ -210,14 +201,10 @@
       # Wait a moment for processes to be killed
       sleep 0.5
       
-      # Start our applications
-      # Uncomment to set wallpaper (replace with your wallpaper path)
-      # ${pkgs.swaybg}/bin/swaybg --output '*' --mode center --image /path-to-your-favorite-wallpaper &
-      
       # Start notification daemon
       ${pkgs.mako}/bin/mako &
       
-      # Start status bar
+      # Start status bar (config will be loaded from ~/.config/waybar)
       ${pkgs.waybar}/bin/waybar &
       
       # Start terminal server (foot)
@@ -228,191 +215,54 @@
     '';
   };
 
-
-  programs.waybar = {
-    enable = true;
-    systemd.enable = false;
-    
-    settings = [
-      {
-        layer = "top";
-        position = "top";
-        height = 30;
-        
-        modules-left = [ "wlr/workspaces" ];
-        modules-center = [ "clock" ];
-        modules-right = [ "battery" "pulseaudio" "network" "tray" ];
-        
-        "wlr/workspaces" = {
-          disable-scroll = true;
-          all-outputs = true;
-          format = "{icon}";
-          format-icons = {
-            "1" = "󰈹";
-            "2" = "󰈹";
-            "3" = "󰈹";
-            "4" = "󰈹";
-            "5" = "󰈹";
-            "urgent" = "";
-            "focused" = "";
-            "default" = "󰈹";
-          };
-        };
-        
-        clock = {
-          format = "{:%H:%M}";
-          format-alt = "{:%Y-%m-%d}";
-          tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
-        };
-        
-        battery = {
-          format = "{capacity}% {icon}";
-          format-icons = ["" "" "" "" ""];
-        };
-        
-        pulseaudio = {
-          format = "{volume}% {icon}";
-          format-muted = "";
-          format-icons = ["" "" ""];
-        };
-        
-        network = {
-          format-wifi = "{essid} ({signalStrength}%) ";
-          format-ethernet = "";
-          tooltip-format = "{ifname} via {gwaddr}";
-        };
-        
-        tray = {
-          icon-size = 21;
-          spacing = 10;
-        };
-      }
-    ];
-    
-    style = ''
-      * {
-        border: none;
-        border-radius: 0;
-        font-family: "JetBrainsMono Nerd Font";
-        font-size: 13px;
-        min-height: 0;
-      }
-      
-      window#waybar {
-        background: rgba(26, 27, 38, 0.9);
-        color: #c0caf5;
-      }
-      
-      #workspaces button {
-        padding: 0 5px;
-        background: transparent;
-        color: #c0caf5;
-        border-bottom: 2px solid transparent;
-      }
-      
-      #workspaces button.focused {
-        border-bottom: 2px solid #7aa2f7;
-        color: #7aa2f7;
-      }
-      
-      #workspaces button.urgent {
-        border-bottom: 2px solid #f7768e;
-      }
-      
-      #clock, #battery, #pulseaudio, #network, #tray {
-        padding: 0 10px;
-        margin: 0 2px;
-      }
-      
-      #battery.charging {
-        color: #9ece6a;
-      }
-      
-      #battery.warning:not(.charging) {
-        color: #e0af68;
-      }
-      
-      #battery.critical:not(.charging) {
-        color: #f7768e;
-      }
-    '';
+  # --------------------------------------------------
+  # Waybar Configuration from GitHub repo
+  # --------------------------------------------------
+  # Create a directory for waybar config
+  home.file.".config/waybar" = {
+    source = pkgs.fetchFromGitHub {
+      owner = "misssglory";  # Replace with your GitHub username
+      repo = "waybar-config";   # Replace with your repo name
+      rev = "b7b524f9ed6d17cae88bcf82c1cfb3806443157b";             # Replace with the branch or commit hash
+      sha256 = "sha256-Byj7KBeVKKcalgJM7YHXSJm9M1+pzm5vafbOBJo1GLo=";  # Replace with actual hash after first build
+    };
+    recursive = true;
   };
 
-  # --------------------------------------------------
-  # Foot Terminal Configuration
-  # --------------------------------------------------
-  xdg.configFile."foot/foot.ini" = {
-    text = ''
-      [main]
-      font=JetBrainsMono Nerd Font:size=13
-      term=foot
-      pad=10x10
-      shell=${pkgs.zsh}/bin/zsh
-      
-      [colors]
-      background=1a1b26
-      foreground=c0caf5
-      
-      regular0=1a1b26
-      regular1=f7768e
-      regular2=9ece6a
-      regular3=e0af68
-      regular4=7aa2f7
-      regular5=bb9af7
-      regular6=7dcfff
-      regular7=a9b1d6
-      
-      bright0=414868
-      bright1=f7768e
-      bright2=9ece6a
-      bright3=e0af68
-      bright4=7aa2f7
-      bright5=bb9af7
-      bright6=7dcfff
-      bright7=c0caf5
-      
-      [cursor]
-      style=beam
-      color=c0caf5
-    '';
-  };
+  # Alternatively, if you want to manage it as a symlink to a local repo:
+  # home.file.".config/waybar" = {
+  #   source = config.lib.file.mkOutOfStoreSymlink "/path/to/your/local/waybar-config";
+  #   recursive = true;
+  # };
 
   # --------------------------------------------------
-  # Mako Configuration
+  # Foot Terminal Configuration from GitHub repo
   # --------------------------------------------------
-  xdg.configFile."mako/config" = {
-    text = ''
-      # Mako notification daemon configuration
-      default-timeout=5000
-      width=300
-      height=100
-      margin=10
-      padding=10
-      border-size=1
-      border-color=#a9b1d6
-      background-color=#1a1b26
-      text-color=#c0caf5
-      progress-color=overlay
-      font=JetBrainsMono Nerd Font 10
-      max-visible=5
-      layer=overlay
-      anchor=top-right
-      
-      [urgency=low]
-      default-timeout=3000
-      
-      [urgency=normal]
-      default-timeout=5000
-      
-      [urgency=high]
-      default-timeout=0
-      background-color=#f7768e
-      text-color=#1a1b26
-    '';
-  };
+  #home.file.".config/foot" = {
+  #  source = pkgs.fetchFromGitHub {
+  #    owner = "yourusername";  # Replace with your GitHub username
+  #    repo = "foot-config";     # Replace with your repo name
+  #    rev = "main";
+  #    sha256 = lib.fakeSha256;
+  #  };
+  #  recursive = true;
+  #};
 
   # --------------------------------------------------
-  # Alacritty configuration
+  # Mako Configuration from GitHub repo
+  # --------------------------------------------------
+  #home.file.".config/mako" = {
+  #  source = pkgs.fetchFromGitHub {
+  #    owner = "yourusername";
+  #    repo = "mako-config";
+  #    rev = "main";
+  #    sha256 = lib.fakeSha256;
+  #  };
+  #  recursive = true;
+  #};
+
+  # --------------------------------------------------
+  # Alacritty configuration (if you still want to keep it)
   # --------------------------------------------------
   programs.alacritty = {
     enable = true;
@@ -473,27 +323,25 @@
   # --------------------------------------------------
   home.packages = with pkgs; [
     # Wayland utilities
-    wl-clipboard     # Clipboard utilities
-    grim             # Screenshot utility
-    slurp            # Region selection for screenshots
-    wmenu            # Application launcher (dmenu replacement)
-    wlsunset         # Day/night color temperature (redshift replacement)
+    wl-clipboard
+    grim
+    slurp
+    wmenu
+    wlsunset
     
     # System utilities
-    pavucontrol      # Audio control
-    networkmanagerapplet  # Network manager applet
+    pavucontrol
+    networkmanagerapplet
+    libnotify
+    mako
+    waybar
+    foot
     
-    # Optional utilities
-    libnotify        # For sending notifications
-    mako             # Notification daemon
-    waybar           # Status bar
-    foot             # Terminal emulator
-    
-    # For screenshots with grim
-    swappy           # Screenshot editor
+    # Screenshot editor
+    swappy
     
     # Clipboard history
-    cliphist         # Clipboard history manager
+    cliphist
   ];
 
   # --------------------------------------------------
