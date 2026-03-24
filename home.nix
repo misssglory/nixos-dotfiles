@@ -68,9 +68,66 @@
     ];
   };
 
-  # --------------------------------------------------
-  # Zsh with Powerlevel10k and plugins
-  # --------------------------------------------------
+  systemd.user.services = {
+    waybar = {
+      Unit = {
+        Description = "Waybar status bar";
+        PartOf = "graphical-session.target";
+        After = "graphical-session.target";
+      };
+      Service = {
+        ExecStart = "${pkgs.waybar}/bin/waybar";
+        Restart = "on-failure";
+        RestartSec = 1;
+      };
+      Install = {
+        WantedBy = [ "graphical-session.target" ];
+      };
+    };
+    
+    mako = {
+      Unit = {
+        Description = "Mako notification daemon";
+        PartOf = "graphical-session.target";
+        After = "graphical-session.target";
+      };
+      Service = {
+        ExecStart = "${pkgs.mako}/bin/mako";
+        Restart = "on-failure";
+        RestartSec = 1;
+      };
+      Install = {
+        WantedBy = [ "graphical-session.target" ];
+      };
+    };
+    
+    swaybg = {
+      Unit = {
+        Description = "Sway background";
+        PartOf = "graphical-session.target";
+        After = "graphical-session.target";
+      };
+      Service = {
+        ExecStart = "${pkgs.swaybg}/bin/swaybg -i /path/to/your/wallpaper.png";
+        Restart = "on-failure";
+        RestartSec = 1;
+      };
+      Install = {
+        WantedBy = [ "graphical-session.target" ];
+      };
+    };
+  };
+  
+  # Start these services when the graphical session starts
+  systemd.user.targets.graphical-session = {
+    Unit = {
+      Description = "Graphical session";
+      Wants = [ "waybar.service" "mako.service" 
+      # "swaybg.service" 
+      ];
+    };
+  };
+
   programs.zsh = {
     enable = true;
     enableCompletion = true;
@@ -127,6 +184,8 @@
       
       # Automatically start dwl on tty1 if not already in a session
       if [ -z "$WAYLAND_DISPLAY" ] && [ -z "$DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
+       # exec ~/.config/dwl/autostart.sh
+        systemctl --user start graphical-session.target
         exec dwl
       fi
     '';
@@ -169,23 +228,7 @@
     '';
   };
 
-  # --------------------------------------------------
-  # Create a desktop entry for dwl
-  # --------------------------------------------------
-  home.file.".local/share/wayland-sessions/dwl.desktop" = {
-    text = ''
-      [Desktop Entry]
-      Name=dwl
-      Comment=Dynamic Wayland Compositor
-      Exec=${pkgs.dwl}/bin/dwl
-      Type=Application
-      DesktopNames=dwl
-    '';
-  };
 
-  # --------------------------------------------------
-  # Waybar Configuration
-  # --------------------------------------------------
   programs.waybar = {
     enable = true;
     systemd.enable = false;
