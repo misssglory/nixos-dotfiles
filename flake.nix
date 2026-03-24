@@ -32,6 +32,8 @@
         modules = [
           ./configuration.nix
           home-manager.nixosModules.home-manager
+          # Import your xray module (create this file)
+          ./modules/xray.nix
           {
             environment.systemPackages = [ self.packages.${system}.dwl ];
             

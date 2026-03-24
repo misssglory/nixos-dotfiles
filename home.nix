@@ -339,11 +339,24 @@
     
     # Screenshot editor
     swappy
-    
-    # Clipboard history
     cliphist
+    xray
   ];
 
+  home.file.".local/bin/xray-proxy" = {
+    executable = true;
+    text = ''
+      #!/bin/bash
+      # Quick proxy toggle script
+      if systemctl is-active --quiet xray-client; then
+        echo "Stopping Xray client..."
+        systemctl stop xray-client
+      else
+        echo "Starting Xray client..."
+        systemctl start xray-client
+      fi
+    '';
+  };
   # --------------------------------------------------
   # Shells
   # --------------------------------------------------

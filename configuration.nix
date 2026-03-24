@@ -163,7 +163,7 @@ virtualisation.podman = {
   security.wrappers = {
     criu = {
       source = "${pkgs.criu}/bin/criu";
-      capabilities = "cap_checkpoint_restore+ep";
+      capabilities = "cap_checkpoint_restore+eip";
       owner = "root";
       group = "root";
     };
@@ -179,6 +179,17 @@ virtualisation.podman = {
   services.openssh.enable = true;
   networking.firewall.enable = false;
 
+  # Enable Xray client with Reality
+  services.xray-client = {
+    enable = true;
+    configFile = "/etc/xray/config.json";
+    user = "nobody";
+    logLevel = "info";
+    useRealityAssets = true;
+  };
+  
+  # Copy your Reality configuration to the system
+  environment.etc."xray/config.json".source = ./xray-config.json;
   # Copy the NixOS configuration file and link it from the resulting system
   # (/run/current-system/configuration.nix). This is useful in case you
   # accidentally delete configuration.nix.
