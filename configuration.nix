@@ -145,6 +145,27 @@ virtualisation.podman = {
     criu
   ];
 
+
+  # In configuration.nix
+environment.etc."proxy.pac" = {
+  text = ''
+    function FindProxyForURL(url, host) {
+      // Direct connection for local addresses
+      if (isPlainHostName(host) ||
+          shExpMatch(host, "localhost") ||
+          shExpMatch(host, "*.local") ||
+          isInNet(host, "10.0.0.0", "255.0.0.0") ||
+          isInNet(host, "172.16.0.0", "255.240.0.0") ||
+          isInNet(host, "192.168.0.0", "255.255.0.0")) {
+        return "DIRECT";
+      }
+      
+      // Use HTTP proxy for most traffic
+      return "PROXY localhost:8080; SOCKS5 localhost:1080; DIRECT";
+    }
+  '';
+};
+
   programs.zsh.enable = true;
   users.defaultUserShell = pkgs.zsh;
   environment.shells = with pkgs; [ zsh ];

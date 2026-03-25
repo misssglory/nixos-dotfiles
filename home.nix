@@ -49,6 +49,42 @@
     '';
   };
 
+
+  home.shellAliases = {
+    proxy-on = ''
+      export http_proxy="http://localhost:8080"
+      export https_proxy="http://localhost:8080"
+      export HTTP_PROXY="http://localhost:8080"
+      export HTTPS_PROXY="http://localhost:8080"
+      export all_proxy="socks5://localhost:1080"
+      export ALL_PROXY="socks5://localhost:1080"
+      echo "Proxy enabled"
+    '';
+    proxy-off = ''
+      unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY all_proxy ALL_PROXY
+      echo "Proxy disabled"
+    '';
+    proxy-status = ''
+      echo "HTTP_PROXY: $HTTP_PROXY"
+      echo "HTTPS_PROXY: $HTTPS_PROXY"
+      echo "ALL_PROXY: $ALL_PROXY"
+    '';
+  };
+  
+  # Add proxy toggle function
+  home.file.".local/bin/proxy-toggle" = {
+    executable = true;
+    text = ''
+      #!/usr/bin/env bash
+      if systemctl is-active --quiet xray-client; then
+        echo "Stopping Xray proxy..."
+        systemctl stop xray-client
+      else
+        echo "Starting Xray proxy..."
+        systemctl start xray-client
+      fi
+    '';
+  };
   # --------------------------------------------------
   # Zoxide + FZF
   # --------------------------------------------------
