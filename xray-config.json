@@ -68,6 +68,17 @@
     }
   ],
   "routing": {
-    "domainStrategy": "IPIfNonMatch"
+    "domainStrategy": "IPIfNonMatch",
+    "rules": [
+        {
+          "type": "field",
+          "outboundTag": "direct",
+            "domain": [
+              "geosite:category-gov-ru",
+              "domain:ru",
+              "domain:su"
+            ]
+        }
+      ]
   }
 }

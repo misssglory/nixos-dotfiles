@@ -143,6 +143,7 @@ virtualisation.podman = {
     wlsunset      # Day/night gamma adjustments for Wayland
     fuzzel
     criu
+    qemu
   ];
 
 

@@ -100,7 +100,8 @@ in {
       
       # Environment variables for xray
       environment = {
-        XRAY_LOCATION_ASSET = "${pkgs.xray}/share/xray";
+        # XRAY_LOCATION_ASSET = "${pkgs.xray}/share/xray";
+        XRAY_LOCATION_ASSET = "/etc/xray";
         XRAY_LOG_LEVEL = cfg.logLevel;
       } // lib.optionalAttrs cfg.useRealityAssets {
         XRAY_UTLS_FINGERPRINT = "chrome";

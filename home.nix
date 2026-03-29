@@ -2,7 +2,7 @@
 
 {
   imports = [
-#    ./modules/neovim.nix
+    ./modules/neovim.nix
   ];
   home.username = "mg";
   home.homeDirectory = "/home/mg";
@@ -404,7 +404,7 @@
   # Neovim configuration symlink
   # --------------------------------------------------
   xdg.configFile."nvim" = {
-    source = config.lib.file.mkOutOfStoreSymlink "/home/tony/nixos-dotfiles/config/nvim";
+    source = config.lib.file.mkOutOfStoreSymlink "/home/mg/nixos-dotfiles/config/nvim";
     recursive = true;
   };
 
