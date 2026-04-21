@@ -1,5 +1,34 @@
 { config, pkgs, ... }:
 
+
+let
+  # --------------------------------------------------
+  # wcc from GitHub at fixed commit
+  # --------------------------------------------------
+  wccSrc = pkgs.fetchFromGitHub {
+    owner  = "misssglory";         # TODO: замени
+    repo   = "wcc";                          # TODO: замени если другое
+    rev    = "0c6ab619f1a7376fea7c743441eaed9a9598c4b0"; # TODO: коммит
+    # Получи sha через:
+    # nix-prefetch-github YOUR_GITHUB_USERNAME wcc --rev 0123...
+    sha256 = "sha256-BZguuhczpNWkpB6fiZPIKPVw+5OclQXmDIRCdiNuew0="; # TODO
+  };
+
+  wcc = pkgs.rustPlatform.buildRustPackage {
+    pname = "wcc";
+    version = "0.1.0";
+
+    src = wccSrc;
+
+    # Если у тебя есть Cargo.lock в репо (рекомендуется):
+    cargoLock = {
+      lockFile = "${wccSrc}/Cargo.lock";
+    };
+
+    # Если Cargo.lock нет, вместо cargoLock используй:
+    # cargoSha256 = "sha256-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb=";
+  };
+in
 {
   imports = [
     ./modules/neovim.nix
@@ -412,6 +441,7 @@
     cliphist
     xray
     mpv
+    wcc
   ];
 
   home.file.".local/bin/xray-proxy" = {
