@@ -5,8 +5,8 @@ let
   wccSrc = pkgs.fetchFromGitHub {
     owner = "misssglory";
     repo = "wcc";
-    rev = "fb20b6ca31e80aa83d763987b38d90776c3eefb1";
-    sha256 = "sha256-/3+GE8neLLCAnZ+k/6PIYVCvfzamuW9h6vC5Aln2flU=";
+    rev = "59c85c1e6e0efa3c5efcb002887d6f449ad0a81a";
+    sha256 = "sha256-4mQIXrCLoZVVFdGOKzQhFPv+Xk6lmhIxbLl0IBKpw28=";
   };
 
   wccPkg = pkgs.rustPlatform.buildRustPackage {
