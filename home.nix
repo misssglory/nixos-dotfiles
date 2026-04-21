@@ -14,12 +14,6 @@
     enable = true;
     userName = "Dmitriy L";
     userEmail = "xhaustlesss@gmail.com";
-    aliases = {
-      s = "status -sb";
-      co = "checkout";
-      c = "commit";
-      br = "branch";
-    };
     ignores = [
       "*.swp"
       ".DS_Store"
@@ -69,6 +63,28 @@
       echo "HTTPS_PROXY: $HTTPS_PROXY"
       echo "ALL_PROXY: $ALL_PROXY"
     '';
+    ga  = "git add -v";
+    gb  = "git branch";
+    gc  = "git commit -m";
+    gca = "git commit --amend --no-edit";
+    gcam = "git commit --amend -m";
+    gch = "git checkout";
+    gd  = "git diff -w";
+    gds = "git diff -w --staged";
+    gl  = "git log";
+    gp  = "git push origin";
+    gpf = "git push origin --force";
+    gra = "git rebase --abort";
+    grb = "git rebase";
+    grc = "git rebase --continue";
+    grh = "git reset --hard";
+    gri = "git rebase -i";
+    grs = "git reset";
+    gst = "git stash";
+    gsp = "git stash pop";
+    gs  = "git status";
+    gdc = "git diff -w -G'(^[^\\*# /])|(^#\\w)|(^\\s+[^\\*#/])'";
+    ls = "lsd";
   };
   
   # Add proxy toggle function
@@ -155,6 +171,21 @@
         WantedBy = [ "graphical-session.target" ];
       };
     };
+
+    cliphist-watcher = {
+      Unit = {
+        Description = "Cliphist clipboard watcher";
+        After = [ "graphical-session.target" ];
+        PartOf = [ "graphical-session.target" ];
+      };
+      Service = {
+        ExecStart = "${pkgs.wl-clipboard}/bin/wl-paste --watch ${pkgs.cliphist}/bin/cliphist store";
+        Restart = "on-failure";
+      };
+      Install = {
+        WantedBy = [ "graphical-session.target" ];
+      };
+    };
   };
   
   # Start these services when the graphical session starts
@@ -218,6 +249,9 @@
     '';
   };
 
+  home.sessionPath = [
+    "$HOME/.local/bin"
+  ];
   # --------------------------------------------------
   # Create dwl autostart script
   # --------------------------------------------------
@@ -259,8 +293,8 @@
     source = pkgs.fetchFromGitHub {
       owner = "misssglory";  # Replace with your GitHub username
       repo = "waybar-config";   # Replace with your repo name
-      rev = "b7b524f9ed6d17cae88bcf82c1cfb3806443157b";             # Replace with the branch or commit hash
-      sha256 = "sha256-Byj7KBeVKKcalgJM7YHXSJm9M1+pzm5vafbOBJo1GLo=";  # Replace with actual hash after first build
+      rev = "b39c27b33ba8e87425dc4b4ac3d31c5c485134ea";             # Replace with the branch or commit hash
+      sha256 = "sha256-aRPLEZp0nQDoTD73JXgbFf72asdToAl+wtHitQ1k8xI=";  # Replace with actual hash after first build
     };
     recursive = true;
   };
@@ -377,6 +411,7 @@
     swappy
     cliphist
     xray
+    mpv
   ];
 
   home.file.".local/bin/xray-proxy" = {
@@ -393,6 +428,12 @@
       fi
     '';
   };
+
+  home.file.".local/bin/cliphist-fuzzel-img-smart" = {
+    source = ./scripts/cliphist-fuzzel-img-smart;
+    executable = true;
+  };
+
   # --------------------------------------------------
   # Shells
   # --------------------------------------------------
@@ -405,6 +446,11 @@
   # --------------------------------------------------
   xdg.configFile."nvim" = {
     source = config.lib.file.mkOutOfStoreSymlink "/home/mg/nixos-dotfiles/config/nvim";
+    recursive = true;
+  };
+
+  xdg.configFile."fuzzel" = {
+    source = config.lib.file.mkOutOfStoreSymlink "/home/mg/nixos-dotfiles/config/fuzzel";
     recursive = true;
   };
 

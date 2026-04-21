@@ -59,12 +59,12 @@
   # No need to set services.xserver.enable again - it's already set above
   # services.xserver.displayManager.gdm.wayland = false; # Remove this unless using GDM
 
-# Enable Podman in configuration.nix
-virtualisation.podman = {
-  enable = true;
-  # Create the default bridge network for podman
-  defaultNetwork.settings.dns_enabled = true;
-};
+  # Enable Podman in configuration.nix
+  virtualisation.podman = {
+    enable = true;
+    # Create the default bridge network for podman
+    defaultNetwork.settings.dns_enabled = true;
+  };
 
 # Optionally, create a Docker compatibility alias
 #programs.zsh.shellAliases = {
@@ -102,8 +102,12 @@ virtualisation.podman = {
   };
 
   # programs.firefox.enable = true;
-  hardware.graphics.enable = true; # Required for GPU access
+  hardware.graphics = {
+    enable = true; # Required for GPU access
+    enable32Bit = true;
+  };
   hardware.amdgpu.opencl.enable = true;
+  hardware.amdgpu.initrd.enable = true;
   hardware.opengl.enable = true;
   # hardware.opengl.extraPackages = [ pkgs.rocm-opencl-icd ];
 
@@ -128,6 +132,8 @@ virtualisation.podman = {
     lazygit
     rocmPackages.clr
     rocmPackages.hipblas
+    rocmPackages.rocminfo
+    clinfo
     btop
     stdenv.cc.cc.lib
     glibc
@@ -144,29 +150,40 @@ virtualisation.podman = {
     fuzzel
     criu
     qemu
+    quickemu
+    solana-cli
+    rustc
+    cargo
+    openssl
+    dust
+    lsd
   ];
 
 
   # In configuration.nix
-environment.etc."proxy.pac" = {
-  text = ''
-    function FindProxyForURL(url, host) {
-      // Direct connection for local addresses
-      if (isPlainHostName(host) ||
-          shExpMatch(host, "localhost") ||
-          shExpMatch(host, "*.local") ||
-          isInNet(host, "10.0.0.0", "255.0.0.0") ||
-          isInNet(host, "172.16.0.0", "255.240.0.0") ||
-          isInNet(host, "192.168.0.0", "255.255.0.0")) {
-        return "DIRECT";
+  environment.etc."proxy.pac" = {
+    text = ''
+      function FindProxyForURL(url, host) {
+        // Direct connection for local addresses
+        if (isPlainHostName(host) ||
+            shExpMatch(host, "localhost") ||
+            shExpMatch(host, "*.local") ||
+            isInNet(host, "10.0.0.0", "255.0.0.0") ||
+            isInNet(host, "172.16.0.0", "255.240.0.0") ||
+            isInNet(host, "192.168.0.0", "255.255.0.0")) {
+          return "DIRECT";
+        }
+        
+        // Use HTTP proxy for most traffic
+        return "PROXY localhost:8080; SOCKS5 localhost:1080; DIRECT";
       }
-      
-      // Use HTTP proxy for most traffic
-      return "PROXY localhost:8080; SOCKS5 localhost:1080; DIRECT";
-    }
-  '';
-};
+    '';
+  };
 
+  systemd.tmpfiles.rules = [ "L+ /var/lib/qemu/firmware - - - - ${pkgs.qemu}/share/qemu/firmware" ];
+
+
+  programs.bash.enable = true;
   programs.zsh.enable = true;
   users.defaultUserShell = pkgs.zsh;
   environment.shells = with pkgs; [ zsh ];
@@ -199,7 +216,11 @@ environment.etc."proxy.pac" = {
   # };
 
   services.openssh.enable = true;
-  networking.firewall.enable = false;
+  networking.firewall = {
+    # enable = false;
+    allowedTCPPorts = [1080 8080];
+    allowedUDPPorts = [1080 8080];
+  };
 
   # Enable Xray client with Reality
   services.xray-client = {
@@ -209,9 +230,14 @@ environment.etc."proxy.pac" = {
     logLevel = "info";
     useRealityAssets = true;
   };
-  
+
+  services.postgresql.enable = true; 
   # Copy your Reality configuration to the system
-  environment.etc."xray/config.json".source = ./xray-config.json;
+  environment.etc = {
+    "xray/config.json".source = ./xray-config.json;
+    "xray/geosite.dat".source = ./geosite.dat;
+  };
+  # environment.etc.
   # Copy the NixOS configuration file and link it from the resulting system
   # (/run/current-system/configuration.nix). This is useful in case you
   # accidentally delete configuration.nix.
