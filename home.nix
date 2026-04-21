@@ -18,6 +18,13 @@ let
       lockFile = "${wccSrc}/Cargo.lock";
     };
   };
+
+  cliphistFuzzelRich = pkgs.rustPlatform.buildRustPackage {
+    pname = "cliphist-fuzzel-rich";
+    version = "0.1.0";
+    src = ./cliphist-fuzzel-rich-rs;
+    cargoLock.lockFile = ./cliphist-fuzzel-rich-rs/Cargo.lock;
+  };
 in
 {
   imports = [
@@ -432,6 +439,7 @@ in
     xray
     mpv
     wccPkg
+    cliphistFuzzelRich
   ];
 
   home.file.".local/bin/xray-proxy" = {
@@ -447,11 +455,6 @@ in
         systemctl start xray-client
       fi
     '';
-  };
-
-  home.file.".local/bin/cliphist-fuzzel-img-smart" = {
-    source = ./scripts/cliphist-fuzzel-img-smart;
-    executable = true;
   };
 
   # --------------------------------------------------
