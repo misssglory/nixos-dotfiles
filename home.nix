@@ -5,8 +5,8 @@ let
   wccSrc = pkgs.fetchFromGitHub {
     owner = "misssglory";
     repo = "wcc";
-    rev = "ee82a8f36db15c3d0bbd6d42ecf41524e1796641";
-    sha256 = "sha256-GWtd+tOY/cqPOCCQg/VuM10n8olQNedSwiFfXqRNOhA=";
+    rev = "68234a9b72a90196e4df6924cbdf9b121ce945ea";
+    sha256 = "sha256-3Ls2y+AAnETTC2r8BOV8OSgjJavriOECw9jTaKyjUBY=";
   };
 
   wccPkg = pkgs.rustPlatform.buildRustPackage {
@@ -33,9 +33,6 @@ in
   home.username = "mg";
   home.homeDirectory = "/home/mg";
 
-  # --------------------------------------------------
-  # Git (unchanged)
-  # --------------------------------------------------
   programs.git = {
     enable = true;
     userName = "Dmitriy L";
@@ -50,25 +47,7 @@ in
     };
   };
 
-  # --------------------------------------------------
-  # SSH (unchanged)
-  # --------------------------------------------------
   services.ssh-agent.enable = true;
-  programs.ssh = {
-    enable = true;
-    matchBlocks = {
-      "github" = {
-        user = "mg";
-        identityFile = "~/.ssh/id_ed25519_github";
-        identitiesOnly = true;
-      };
-    };
-    extraConfig = ''
-      Host *
-        ForwardAgent yes
-    '';
-  };
-
 
   home.shellAliases = {
     proxy-on = ''
@@ -129,9 +108,7 @@ in
       fi
     '';
   };
-  # --------------------------------------------------
-  # Zoxide + FZF
-  # --------------------------------------------------
+
   programs.zoxide = {
     enable = true;
     enableZshIntegration = true;
@@ -148,9 +125,6 @@ in
     ];
   };
 
-  # --------------------------------------------------
-  # Systemd user services for Wayland components
-  # --------------------------------------------------
   systemd.user.services = {
     waybar = {
       Unit = {
@@ -220,13 +194,10 @@ in
   systemd.user.targets.graphical-session = {
     Unit = {
       Description = "Graphical session";
-      Wants = [ "waybar.service" "mako.service" "cliphist-watcher.service" ];
+      Wants = [ "waybar.service" "mako.service" "cliphist-watcher.service" "ssh-add-keys" ];
     };
   };
 
-  # --------------------------------------------------
-  # Zsh configuration
-  # --------------------------------------------------
   programs.zsh = {
     enable = true;
     enableCompletion = true;
@@ -248,6 +219,15 @@ in
     ];
 
     initExtraBeforeCompInit = ''
+      if ! ssh-add -l 2>/dev/null | grep -q 25519; then
+        echo "Loading SSH keys..."
+        for key in ~/.ssh/*25519*; do
+          if [[ -f "$key" && "$key" != *.pub ]]; then
+            ssh-add "$key"
+          fi
+        done
+      fi
+
       # Powerlevel10k theme
       if [ -f "${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k/powerlevel10k.zsh-theme" ]; then
         source "${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k/powerlevel10k.zsh-theme"
@@ -280,9 +260,7 @@ in
   home.sessionPath = [
     "$HOME/.local/bin"
   ];
-  # --------------------------------------------------
-  # Create dwl autostart script
-  # --------------------------------------------------
+
   home.file.".config/dwl/autostart.sh" = {
     executable = true;
     text = ''
@@ -313,10 +291,6 @@ in
     '';
   };
 
-  # --------------------------------------------------
-  # Waybar Configuration from GitHub repo
-  # --------------------------------------------------
-  # Create a directory for waybar config
   home.file.".config/waybar" = {
     source = pkgs.fetchFromGitHub {
       owner = "misssglory";  # Replace with your GitHub username
@@ -359,9 +333,6 @@ in
   #  recursive = true;
   #};
 
-  # --------------------------------------------------
-  # Alacritty configuration (if you still want to keep it)
-  # --------------------------------------------------
   programs.alacritty = {
     enable = true;
     settings = {
@@ -416,9 +387,6 @@ in
     };
   };
 
-  # --------------------------------------------------
-  # User packages for Wayland environment
-  # --------------------------------------------------
   home.packages = with pkgs; [
     # Wayland utilities
     wl-clipboard
@@ -442,6 +410,13 @@ in
     mpv
     wccPkg
     cliphistFuzzelRich
+
+    (pkgs.writeShellScriptBin "chromium-proxychains" ''
+      exec ${pkgs.proxychains}/bin/proxychains4 \
+        ${pkgs.ungoogled-chromium}/bin/chromium \
+        --user-data-dir="$HOME/.config/chromium-proxychains" \
+        "$@"
+    '')
   ];
 
   home.file.".local/bin/xray-proxy" = {
@@ -459,16 +434,10 @@ in
     '';
   };
 
-  # --------------------------------------------------
-  # Shells
-  # --------------------------------------------------
   programs.bash = {
     enable = true;
   };
   
-  # --------------------------------------------------
-  # Neovim configuration symlink
-  # --------------------------------------------------
   xdg.configFile."nvim" = {
     source = config.lib.file.mkOutOfStoreSymlink "/home/mg/nixos-dotfiles/config/nvim";
     recursive = true;
@@ -477,6 +446,18 @@ in
   xdg.configFile."fuzzel" = {
     source = config.lib.file.mkOutOfStoreSymlink "/home/mg/nixos-dotfiles/config/fuzzel";
     recursive = true;
+  };
+
+  xdg.desktopEntries = {
+    ungoogled-chromium-proxychains = {
+      name = "Chromium (Proxy)";
+      genericName = "Web Browser via Proxychains";
+      exec = "chromium-proxychains %U";
+      icon = "chromium";
+      terminal = false;
+      categories = [ "Network" "WebBrowser" ];
+      mimeType = [ "text/html" "text/xml" "application/xhtml+xml" ];
+    };
   };
 
   home.stateVersion = "25.11";
