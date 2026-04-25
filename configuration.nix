@@ -126,6 +126,7 @@
     fd
     zellij
     fzf
+    bat
     telegram-desktop
     light
     ungoogled-chromium
@@ -157,6 +158,11 @@
     openssl
     dust
     lsd
+    cmake
+    ninja
+    clang
+    pkg-config
+    openssl
   ];
 
 
@@ -237,6 +243,30 @@
     "xray/config.json".source = ./xray-config.json;
     "xray/geosite.dat".source = ./geosite.dat;
   };
+
+  programs.proxychains = {
+    enable = true;
+
+    # Лучше использовать оригинальный proxychains, не NG:
+    # с ним точно работает генерация конфигурации из NixOS options.[web:417][web:418]
+    package = pkgs.proxychains;
+
+    # Можно выбрать тип цепочки, по умолчанию "dynamic".
+    # Например, strict: все прокси должны быть доступны.
+    chain.type = "dynamic";
+
+    # Проксировать DNS, чтобы не светить реальные запросы.
+    proxyDNS = true;
+
+    # Прокси, через который будем гонять всё.
+    proxies.mySocks5 = {
+      type = "socks5";
+      host = "127.0.0.1";
+      port = 1080;
+      enable = true;  # если в твоей версии опция есть, можно явно включить
+    };
+  };
+
   # environment.etc.
   # Copy the NixOS configuration file and link it from the resulting system
   # (/run/current-system/configuration.nix). This is useful in case you

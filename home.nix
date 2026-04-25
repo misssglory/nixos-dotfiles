@@ -5,8 +5,8 @@ let
   wccSrc = pkgs.fetchFromGitHub {
     owner = "misssglory";
     repo = "wcc";
-    rev = "59c85c1e6e0efa3c5efcb002887d6f449ad0a81a";
-    sha256 = "sha256-4mQIXrCLoZVVFdGOKzQhFPv+Xk6lmhIxbLl0IBKpw28=";
+    rev = "ee82a8f36db15c3d0bbd6d42ecf41524e1796641";
+    sha256 = "sha256-GWtd+tOY/cqPOCCQg/VuM10n8olQNedSwiFfXqRNOhA=";
   };
 
   wccPkg = pkgs.rustPlatform.buildRustPackage {
@@ -111,6 +111,8 @@ in
     gs  = "git status";
     gdc = "git diff -w -G'(^[^\\*# /])|(^#\\w)|(^\\s+[^\\*#/])'";
     ls = "lsd";
+    cb = "wcc build";
+    cr = "wcc run";
   };
   
   # Add proxy toggle function
@@ -218,7 +220,7 @@ in
   systemd.user.targets.graphical-session = {
     Unit = {
       Description = "Graphical session";
-      Wants = [ "waybar.service" "mako.service" ];
+      Wants = [ "waybar.service" "mako.service" "cliphist-watcher.service" ];
     };
   };
 
