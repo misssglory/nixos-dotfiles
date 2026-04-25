@@ -129,7 +129,6 @@
     bat
     telegram-desktop
     light
-    ungoogled-chromium
     lazygit
     rocmPackages.clr
     rocmPackages.hipblas

@@ -94,7 +94,6 @@ in
     cr = "wcc run";
   };
   
-  # Add proxy toggle function
   home.file.".local/bin/proxy-toggle" = {
     executable = true;
     text = ''
@@ -158,22 +157,6 @@ in
       };
     };
     
-    swaybg = {
-      Unit = {
-        Description = "Sway background";
-        PartOf = "graphical-session.target";
-        After = "graphical-session.target";
-      };
-      Service = {
-        ExecStart = "${pkgs.swaybg}/bin/swaybg -i /path/to/your/wallpaper.png";
-        Restart = "on-failure";
-        RestartSec = 1;
-      };
-      Install = {
-        WantedBy = [ "graphical-session.target" ];
-      };
-    };
-
     cliphist-watcher = {
       Unit = {
         Description = "Cliphist clipboard watcher";
@@ -293,45 +276,13 @@ in
 
   home.file.".config/waybar" = {
     source = pkgs.fetchFromGitHub {
-      owner = "misssglory";  # Replace with your GitHub username
-      repo = "waybar-config";   # Replace with your repo name
-      rev = "b39c27b33ba8e87425dc4b4ac3d31c5c485134ea";             # Replace with the branch or commit hash
-      sha256 = "sha256-aRPLEZp0nQDoTD73JXgbFf72asdToAl+wtHitQ1k8xI=";  # Replace with actual hash after first build
+      owner = "misssglory";
+      repo = "waybar-config";
+      rev = "b39c27b33ba8e87425dc4b4ac3d31c5c485134ea";
+      sha256 = "sha256-aRPLEZp0nQDoTD73JXgbFf72asdToAl+wtHitQ1k8xI=";
     };
     recursive = true;
   };
-
-  # Alternatively, if you want to manage it as a symlink to a local repo:
-  # home.file.".config/waybar" = {
-  #   source = config.lib.file.mkOutOfStoreSymlink "/path/to/your/local/waybar-config";
-  #   recursive = true;
-  # };
-
-  # --------------------------------------------------
-  # Foot Terminal Configuration from GitHub repo
-  # --------------------------------------------------
-  #home.file.".config/foot" = {
-  #  source = pkgs.fetchFromGitHub {
-  #    owner = "yourusername";  # Replace with your GitHub username
-  #    repo = "foot-config";     # Replace with your repo name
-  #    rev = "main";
-  #    sha256 = lib.fakeSha256;
-  #  };
-  #  recursive = true;
-  #};
-
-  # --------------------------------------------------
-  # Mako Configuration from GitHub repo
-  # --------------------------------------------------
-  #home.file.".config/mako" = {
-  #  source = pkgs.fetchFromGitHub {
-  #    owner = "yourusername";
-  #    repo = "mako-config";
-  #    rev = "main";
-  #    sha256 = lib.fakeSha256;
-  #  };
-  #  recursive = true;
-  #};
 
   programs.alacritty = {
     enable = true;
@@ -410,11 +361,17 @@ in
     mpv
     wccPkg
     cliphistFuzzelRich
-
-    (pkgs.writeShellScriptBin "chromium-proxychains" ''
-      exec ${pkgs.proxychains}/bin/proxychains4 \
-        ${pkgs.ungoogled-chromium}/bin/chromium \
-        --user-data-dir="$HOME/.config/chromium-proxychains" \
+    (pkgs.writeShellScriptBin "chromium-proxy" ''
+      exec ${pkgs.ungoogled-chromium}/bin/chromium \
+        --proxy-server="socks5://localhost:1080" \
+        --user-data-dir="$HOME/.config/chromium-proxy" \
+        --no-default-browser-check \
+        "$@"
+    '')
+    (pkgs.writeShellScriptBin "chromium-regular" ''
+      exec ${pkgs.ungoogled-chromium}/bin/chromium \
+        --user-data-dir="$HOME/.config/chromium" \
+        --no-default-browser-check \
         "$@"
     '')
   ];
@@ -449,14 +406,31 @@ in
   };
 
   xdg.desktopEntries = {
-    ungoogled-chromium-proxychains = {
-      name = "Chromium (Proxy)";
-      genericName = "Web Browser via Proxychains";
-      exec = "chromium-proxychains %U";
+    ungoogled-chromium-proxy = {
+      name = "Chromium Proxy";
+      genericName = "Web Browser with SOCKS5 Proxy";
+      exec = "chromium-proxy %U";
       icon = "chromium";
       terminal = false;
       categories = [ "Network" "WebBrowser" ];
-      mimeType = [ "text/html" "text/xml" "application/xhtml+xml" ];
+      mimeType = [ 
+        "text/html" 
+        "text/xml" 
+        "application/xhtml+xml" 
+        "x-scheme-handler/http" 
+        "x-scheme-handler/https" 
+      ];
+      startupNotify = true;
+    };
+
+    ungoogled-chromium-direct = {
+      name = "Chromium Direct";
+      genericName = "Web Browser without Proxy";
+      exec = "chromium-regular %U";
+      icon = "chromium";
+      terminal = false;
+      categories = [ "Network" "WebBrowser" ];
+      startupNotify = true;
     };
   };
 
