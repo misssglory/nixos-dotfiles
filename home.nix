@@ -5,8 +5,8 @@ let
   wccSrc = pkgs.fetchFromGitHub {
     owner = "misssglory";
     repo = "wcc";
-    rev = "68234a9b72a90196e4df6924cbdf9b121ce945ea";
-    sha256 = "sha256-3Ls2y+AAnETTC2r8BOV8OSgjJavriOECw9jTaKyjUBY=";
+    rev = "b9567b19fc3f59ff4f5ad140c16dfef22e064a39";
+    sha256 = "sha256-Pvd3nDrQShgD8iJp4iJc6NQ2Jm1yUSYe1EflCDopmCk=";
   };
 
   wccPkg = pkgs.rustPlatform.buildRustPackage {
@@ -92,6 +92,14 @@ in
     ls = "lsd";
     cb = "wcc build";
     cr = "wcc run";
+    crr = "cargo run -r";
+    crd = "cargo run";
+    cbd = "cargo build";
+    cbb = "cargo build -r";
+    pc4 = "proxychains4";
+    cp = "cp -v";
+    mv = "mv -v";
+    rm = "rm -v";
   };
   
   home.file.".local/bin/proxy-toggle" = {
@@ -164,7 +172,9 @@ in
         PartOf = [ "graphical-session.target" ];
       };
       Service = {
-        ExecStart = "${pkgs.wl-clipboard}/bin/wl-paste --watch ${pkgs.cliphist}/bin/cliphist store";
+        Type = "exec";
+        # small wrapper that waits for the socket
+        ExecStart = "${pkgs.bash}/bin/bash -lc '${pkgs.wl-clipboard}/bin/wl-paste --watch ${pkgs.cliphist}/bin/cliphist store'";
         Restart = "on-failure";
       };
       Install = {
@@ -177,7 +187,7 @@ in
   systemd.user.targets.graphical-session = {
     Unit = {
       Description = "Graphical session";
-      Wants = [ "waybar.service" "mako.service" "cliphist-watcher.service" "ssh-add-keys" ];
+      Wants = [ "waybar.service" "mako.service" "cliphist-watcher.service" ];
     };
   };
 
@@ -248,28 +258,6 @@ in
     executable = true;
     text = ''
       #!/bin/bash
-      
-      # Kill already running duplicate processes
-      _ps="waybar mako swaybg foot"
-      for _prs in $_ps; do
-          if pidof "$_prs" >/dev/null 2>&1; then
-              killall -9 "$_prs" 2>/dev/null || true
-          fi
-      done
-      
-      # Wait a moment for processes to be killed
-      sleep 0.5
-      
-      # Start notification daemon
-      ${pkgs.mako}/bin/mako &
-      
-      # Start status bar (config will be loaded from ~/.config/waybar)
-      ${pkgs.waybar}/bin/waybar &
-      
-      # Start terminal server (foot)
-      ${pkgs.foot}/bin/foot --server &
-      
-      # Update environment for systemd and Wayland
       ${pkgs.dbus}/bin/dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=wlroots
     '';
   };

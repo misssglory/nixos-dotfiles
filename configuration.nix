@@ -154,6 +154,10 @@
     solana-cli
     rustc
     cargo
+    clippy
+    rust-analyzer
+    lua-language-server
+    pyright
     openssl
     dust
     lsd
@@ -162,6 +166,8 @@
     clang
     pkg-config
     openssl
+    sops
+    age
   ];
 
 
