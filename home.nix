@@ -1,35 +1,40 @@
+# home.nix
 { config, pkgs, ... }:
-
 
 let
   wccSrc = pkgs.fetchFromGitHub {
     owner = "misssglory";
     repo = "wcc";
-    rev = "3f94e1b6128dde8c7a41fb3dc7a0fd6ece31cd19";
-    sha256 = "sha256-anBS4J5E6Et7Ca2TtVQDDa8teHa/UtcB8aXjPuLWRns=";
+    rev = "34ef94f5419cfcc863fb3b4f95cc0feb6b7622f8";
+    sha256 = "sha256-F2H6HfWJl/wmD9wkLlnaQkERAnTrrdC2aKrxzVk4tug=";
   };
 
   wccPkg = pkgs.rustPlatform.buildRustPackage {
     pname = "wcc";
     version = "0.1.0";
     src = wccSrc;
+    cargoLock.lockFile = "${wccSrc}/Cargo.lock";
+  };
 
-    cargoLock = {
-      lockFile = "${wccSrc}/Cargo.lock";
-    };
+  cliphistFuzzelRichSrc = pkgs.fetchFromGitHub {
+    owner = "misssglory";
+    repo = "cliphist-fuzzel-rich-rs";
+    rev = "a082ac1fac734686deba2f196772cad002641ffc";
+    sha256 = "sha256-dSpu1omnx+Y3vylLiAf1ZLuiVJxJQoIhcKaQZB/aXd8=";
   };
 
   cliphistFuzzelRich = pkgs.rustPlatform.buildRustPackage {
     pname = "cliphist-fuzzel-rich";
     version = "0.1.0";
-    src = ./cliphist-fuzzel-rich-rs;
-    cargoLock.lockFile = ./cliphist-fuzzel-rich-rs/Cargo.lock;
+    src = cliphistFuzzelRichSrc;
+    cargoLock.lockFile = "${cliphistFuzzelRichSrc}/Cargo.lock";
   };
 in
 {
   imports = [
     ./modules/neovim.nix
   ];
+
   home.username = "mg";
   home.homeDirectory = "/home/mg";
 
@@ -88,7 +93,7 @@ in
     gst = "git stash";
     gsp = "git stash pop";
     gs  = "git status";
-    gdc = "git diff -w -G'(^[^\\*# /])|(^#\\w)|(^\\s+[^\\*#/])'";
+    gdc = "git diff -w -G'(^[^\\\\*# /])|(^#\\\\w)|(^\\\\s+[^\\\\*#/])'";
     ls = "lsd";
     cb = "wcc build";
     cr = "wcc run";
@@ -173,7 +178,6 @@ in
       };
       Service = {
         Type = "exec";
-        # small wrapper that waits for the socket
         ExecStart = "${pkgs.bash}/bin/bash -lc '${pkgs.wl-clipboard}/bin/wl-paste --watch ${pkgs.cliphist}/bin/cliphist store'";
         Restart = "on-failure";
       };
@@ -183,7 +187,6 @@ in
     };
   };
   
-  # Start these services when the graphical session starts
   systemd.user.targets.graphical-session = {
     Unit = {
       Description = "Graphical session";
@@ -221,20 +224,16 @@ in
         done
       fi
 
-      # Powerlevel10k theme
       if [ -f "${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k/powerlevel10k.zsh-theme" ]; then
         source "${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k/powerlevel10k.zsh-theme"
       fi
     '';
 
     initExtra = ''
-      # If you generated ~/.p10k.zsh once, you can have HM manage it as a dotfile.
       [[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
 
-      # zoxide keybindings
       eval "$(zoxide init zsh)"
       
-      # Wayland environment variables
       export XDG_CURRENT_DESKTOP=wlroots
       export XDG_SESSION_TYPE=wayland
       export QT_QPA_PLATFORM=wayland
@@ -242,7 +241,6 @@ in
       export CLUTTER_BACKEND=wayland
       export _JAVA_AWT_WM_NONREPARENTING=1
       
-      # Automatically start dwl on tty1 if not already in a session
       if [ -z "$WAYLAND_DISPLAY" ] && [ -z "$DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
         systemctl --user start graphical-session.target
         exec dwl
@@ -327,14 +325,12 @@ in
   };
 
   home.packages = with pkgs; [
-    # Wayland utilities
     wl-clipboard
     grim
     slurp
     wmenu
     wlsunset
     
-    # System utilities
     pavucontrol
     networkmanagerapplet
     libnotify
@@ -342,7 +338,6 @@ in
     waybar
     foot
     
-    # Screenshot editor
     swappy
     cliphist
     xray
@@ -368,7 +363,6 @@ in
     executable = true;
     text = ''
       #!/bin/bash
-      # Quick proxy toggle script
       if systemctl is-active --quiet xray-client; then
         echo "Stopping Xray client..."
         systemctl stop xray-client
@@ -379,18 +373,10 @@ in
     '';
   };
 
-  programs.bash = {
-    enable = true;
-  };
-  
-  xdg.configFile."nvim" = {
-    source = config.lib.file.mkOutOfStoreSymlink "/home/mg/nixos-dotfiles/config/nvim";
-    recursive = true;
-  };
+  programs.bash.enable = true;
 
-  xdg.configFile."fuzzel" = {
-    source = config.lib.file.mkOutOfStoreSymlink "/home/mg/nixos-dotfiles/config/fuzzel";
-    recursive = true;
+  xdg.configFile."fuzzel/fuzzel.ini" = {
+    source = "${cliphistFuzzelRichSrc}/fuzzel.ini";
   };
 
   xdg.desktopEntries = {
