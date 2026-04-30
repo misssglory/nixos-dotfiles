@@ -9,7 +9,7 @@
     };
 
     dwl = {
-      url = "github:misssglory/dwl-setup/e68cd32395202c98678062557875ca0099c66637";
+      url = "github:misssglory/dwl-setup/5d93ed64d446a38e8be689eb7ab7ecbcd5ffa192";
       flake = false;
     };
 
@@ -35,16 +35,19 @@
 
       nixosConfigurations.nixos-btw = nixpkgs.lib.nixosSystem {
         inherit system;
-        specialArgs = { inherit self; };
+        specialArgs = { inherit self sops-nix; };
         modules = [
           ./configuration.nix
-          ./sops.nix
-          ./modules/rex.nix
+          ./modules/bundle.nix
           home-manager.nixosModules.home-manager
           ./modules/xray.nix
           sops-nix.nixosModules.sops
           {
-            environment.systemPackages = [ self.packages.${system}.dwl ];
+            environment.systemPackages = with pkgs; [
+              self.packages.${system}.dwl
+              pkg-config
+              openssl
+            ];
 
             home-manager = {
               useGlobalPkgs = true;

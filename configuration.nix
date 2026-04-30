@@ -158,14 +158,11 @@
     rust-analyzer
     lua-language-server
     pyright
-    openssl
     dust
     lsd
     cmake
     ninja
     clang
-    pkg-config
-    openssl
     sops
     age
   ];
