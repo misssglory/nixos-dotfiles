@@ -165,8 +165,13 @@
     clang
     sops
     age
+    nvimpager
   ];
 
+  environment.variables = {
+    PAGER = "nvimpager";
+    SYSTEMD_PAGER = "nvimpager";
+  };
 
   # In configuration.nix
   environment.etc."proxy.pac" = {

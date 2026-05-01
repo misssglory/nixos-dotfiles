@@ -1,5 +1,6 @@
 {
   description = "NixOS";
+
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-25.11";
 
@@ -25,12 +26,16 @@
       pkgs = nixpkgs.legacyPackages.${system};
       wlroots = pkgs.wlroots_0_18;
     in {
-      packages.${system}.dwl = pkgs.callPackage ./dwl.nix {
-        src = dwl;
-        inherit wlroots;
-        xorg = pkgs.xorg;
-        libxkbcommon = pkgs.libxkbcommon;
-        pixman = pkgs.pixman;
+      packages.${system} = {
+        dwl = pkgs.callPackage ./dwl.nix {
+          src = dwl;
+          inherit wlroots;
+          xorg = pkgs.xorg;
+          libxkbcommon = pkgs.libxkbcommon;
+          pixman = pkgs.pixman;
+        };
+
+        spl-token-cli = pkgs.callPackage ./pkgs/spl-token-cli.nix {};
       };
 
       nixosConfigurations.nixos-btw = nixpkgs.lib.nixosSystem {
@@ -45,6 +50,7 @@
           {
             environment.systemPackages = with pkgs; [
               self.packages.${system}.dwl
+              self.packages.${system}.spl-token-cli
               pkg-config
               openssl
             ];
