@@ -3,6 +3,8 @@
 
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-25.11";
+    # zed.url     = "github:zed-industries/zed";
+    nixpkgs-unstable.url = "nixpkgs/nixos-unstable";
 
     home-manager = {
       url = "github:nix-community/home-manager/release-25.11";
@@ -20,10 +22,11 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, dwl, sops-nix, ... }:
+  outputs = { self, nixpkgs, nixpkgs-unstable, home-manager, dwl, sops-nix, ... }:
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
+      unstable = nixpkgs-unstable.legacyPackages.${system};
       wlroots = pkgs.wlroots_0_18;
     in {
       packages.${system} = {
@@ -36,13 +39,16 @@
         };
 
         spl-token-cli = pkgs.callPackage ./pkgs/spl-token-cli.nix {};
+
+        # zed-latest = zed.packages.${system}.default;
       };
 
       nixosConfigurations.nixos-btw = nixpkgs.lib.nixosSystem {
         inherit system;
-        specialArgs = { inherit self sops-nix; };
+        specialArgs = { inherit self sops-nix unstable; };
         modules = [
           ./configuration.nix
+          ./modules/postgres.nix
           ./modules/bundle.nix
           home-manager.nixosModules.home-manager
           ./modules/xray.nix
@@ -51,6 +57,7 @@
             environment.systemPackages = with pkgs; [
               self.packages.${system}.dwl
               self.packages.${system}.spl-token-cli
+              # self.packages.${system}.zed-latest
               pkg-config
               openssl
             ];
@@ -60,6 +67,8 @@
               useUserPackages = true;
               users.mg = import ./home.nix;
               backupFileExtension = "backup";
+
+              extraSpecialArgs = { inherit unstable; };
             };
           }
         ];

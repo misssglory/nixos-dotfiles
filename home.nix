@@ -1,5 +1,5 @@
 # home.nix
-{ config, pkgs, ... }:
+{ config, pkgs, unstable, ... }:
 
 let
   wccSrc = pkgs.fetchFromGitHub {
@@ -29,6 +29,7 @@ let
     src = cliphistFuzzelRichSrc;
     cargoLock.lockFile = "${cliphistFuzzelRichSrc}/Cargo.lock";
   };
+
 in
 {
   imports = [
@@ -358,6 +359,12 @@ in
         "$@"
     '')
   ];
+
+  programs.zed-editor = {
+    enable = true;
+    package = unstable.zed-editor;
+    # settings = { ... }; # optional JSON settings mapped to Zed config
+  };
 
   home.file.".local/bin/xray-proxy" = {
     executable = true;

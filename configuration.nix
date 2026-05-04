@@ -22,6 +22,7 @@
 
   # Set your time zone.
   time.timeZone = "Europe/Moscow";
+  nixpkgs.config.allowUnfree = true;
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
@@ -244,8 +245,6 @@
     useRealityAssets = true;
   };
 
-  services.postgresql.enable = true; 
-  # Copy your Reality configuration to the system
   environment.etc = {
     "xray/config.json".source = ./xray-config.json;
     "xray/geosite.dat".source = ./geosite.dat;
