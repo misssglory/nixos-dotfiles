@@ -3,7 +3,6 @@
 
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-25.11";
-    # zed.url     = "github:zed-industries/zed";
     nixpkgs-unstable.url = "nixpkgs/nixos-unstable";
 
     home-manager = {
@@ -43,9 +42,27 @@
         # zed-latest = zed.packages.${system}.default;
       };
 
+      homeConfigurations."mg" = home-manager.lib.homeManagerConfiguration {
+        inherit pkgs;
+
+        extraSpecialArgs = {
+          inherit unstable;
+        };
+
+        modules = [
+          ./home.nix
+          {
+            home.username = "mg";
+            home.homeDirectory = "/home/mg";
+            programs.home-manager.enable = true;
+          }
+        ];
+      };
+
       nixosConfigurations.nixos-btw = nixpkgs.lib.nixosSystem {
         inherit system;
         specialArgs = { inherit self sops-nix unstable; };
+
         modules = [
           ./configuration.nix
           ./modules/postgres.nix
@@ -53,11 +70,11 @@
           home-manager.nixosModules.home-manager
           ./modules/xray.nix
           sops-nix.nixosModules.sops
+
           {
             environment.systemPackages = with pkgs; [
               self.packages.${system}.dwl
               self.packages.${system}.spl-token-cli
-              # self.packages.${system}.zed-latest
               pkg-config
               openssl
             ];
@@ -68,7 +85,9 @@
               users.mg = import ./home.nix;
               backupFileExtension = "backup";
 
-              extraSpecialArgs = { inherit unstable; };
+              extraSpecialArgs = {
+                inherit unstable;
+              };
             };
           }
         ];

@@ -167,6 +167,7 @@
     sops
     age
     nvimpager
+    home-manager
   ];
 
   environment.variables = {

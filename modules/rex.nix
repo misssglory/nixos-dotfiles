@@ -4,7 +4,7 @@
 let
   cfg = config.services.rex;
   
-  binaryPath = "${cfg.projectDir}/example/cpp/build/td_all_channels_solana_listener";
+  binaryPath = "${cfg.projectDir}/example/cpp/build/td_all_channels_listener";
   configPath = "${cfg.projectDir}/example/cpp/listener.json";
 
   rexWrapper = pkgs.writeShellScript "rex-wrapper" ''

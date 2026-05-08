@@ -5,8 +5,8 @@ let
   wccSrc = pkgs.fetchFromGitHub {
     owner = "misssglory";
     repo = "wcc";
-    rev = "34ef94f5419cfcc863fb3b4f95cc0feb6b7622f8";
-    sha256 = "sha256-F2H6HfWJl/wmD9wkLlnaQkERAnTrrdC2aKrxzVk4tug=";
+    rev = "354c95aa929a7b6d3203a9f9afbcc97f009ffdab";
+    sha256 = "sha256-Yyj44TRXl6TYSsuyJU0JONaq7x/9lCPNRnrXIrAb7/Y=";
   };
 
   wccPkg = pkgs.rustPlatform.buildRustPackage {
@@ -341,7 +341,6 @@ in
     
     swappy
     cliphist
-    xray
     mpv
     wccPkg
     cliphistFuzzelRich
