@@ -1,4 +1,3 @@
-# modules/neovim.nix
 { config, pkgs, lib, ... }:
 
 let
@@ -7,25 +6,29 @@ let
   # (init.lua, lua/, etc at the top level).
   nvimConfigSrc = pkgs.fetchFromGitHub {
     owner = "misssglory";
-    repo  = "nvim";          # <- your Neovim repo name
-    rev   = "127c723a048f5c49fced4ff9d6b9e4cca711c214";           # <- pin a commit hash
-    sha256 = "sha256-K/10kaOH/lymXgeTxK2Zvy3Lkb3upMftJAPAERK6nQ8=";
+    repo  = "nvim";
+    rev   = "b05cf85ac9967d32b67cef1fd74ce263ec488467";
+    sha256 = "sha256-DZPS9YDgX1+sGRMJ8vstNrGbwvp0WfD0Qx/gIDMO+eY=";
   };
 in
 {
   # Install Neovim and dependencies
   home.packages = with pkgs; [
-    # Tools required for Telescope
+    # Tools required for Telescope / pickers
     ripgrep
     fd
     fzf
+
+    # Extra tooling that helps fff.nvim (but *not* cargo/rustc here;
+    # they already come from environment.systemPackages)
+    git
 
     # Language Servers
     lua-language-server
     nil # nix language server
     nixpkgs-fmt # nix formatter
 
-    # Needed for lazy.nvim
+    # Needed for your Neovim plugin ecosystem (node-based stuff)
     nodejs
   ];
 
@@ -35,7 +38,7 @@ in
     vimAlias = true;
     defaultEditor = true;
 
-    # You still let lazy.nvim manage plugins in the repo.
+    # You still let your custom manager manage plugins in the repo.
     # If you ever switch to Nix-managed plugins, you can use `plugins = ...` here.
   };
 

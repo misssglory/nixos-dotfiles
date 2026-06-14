@@ -19,6 +19,7 @@
 
   networking.hostName = "nixos-btw"; # Define your hostname.
   networking.networkmanager.enable = true;
+  networking.nameservers = [ "1.1.1.1" "8.8.8.8" ];
 
   # Set your time zone.
   time.timeZone = "Europe/Moscow";
@@ -35,6 +36,7 @@
   #   keyMap = "us";
   #   useXkbConfig = true; # use xkb.options in tty.
   # };
+  programs.amnezia-vpn.enable = true;
 
   # X11 and Wayland setup
   # Enable X11 server for XWayland compatibility only
@@ -129,7 +131,6 @@
     fzf
     bat
     telegram-desktop
-    light
     lazygit
     rocmPackages.clr
     rocmPackages.hipblas
@@ -168,7 +169,38 @@
     age
     nvimpager
     home-manager
+    logrotate
+    wireguard-tools
+    wayland
+    libxkbcommon
+    vulkan-loader
+    mesa
+    libGL
+    xorg.libX11
+    xorg.libXcursor
+    xorg.libXi
+    xorg.libXrandr
+    xorg.libXinerama
+    xorg.libXext
+    xorg.libXfixes
+    xorg.libxcb
+    xorg.xcbutilkeysyms
+    xcb-util-cursor
   ];
+
+  environment.etc."wireguard/wg0.conf" = {
+    # IMPORTANT: Create a 'wireguard' folder in the same directory as your configuration.nix
+    # and place your wg0.conf file inside it.
+    # The path below assumes your file is at ./wireguard/wg0.conf
+    source = ./lithuania.conf;
+    mode = "0600";  # Restrict permissions for security (only root can read/write)
+  };
+
+  # If you want to use wg-quick to manage the interface (enables autostart)
+  # networking.wg-quick.interfaces.wg0 = {
+  #   configFile = "/etc/wireguard/wg0.conf";
+  #   autostart = true;  # Start WireGuard on boot
+  # };
 
   environment.variables = {
     PAGER = "nvimpager";
@@ -206,11 +238,6 @@
   fonts.packages = with pkgs; [
     nerd-fonts.jetbrains-mono
   ];
-
-  networking.wg-quick.interfaces.lithuania = {
-    configFile = "/etc/nixos/files/wireguard/lithuania.conf";
-    autostart = false;
-  };
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 

@@ -5,8 +5,8 @@ let
   wccSrc = pkgs.fetchFromGitHub {
     owner = "misssglory";
     repo = "wcc";
-    rev = "354c95aa929a7b6d3203a9f9afbcc97f009ffdab";
-    sha256 = "sha256-Yyj44TRXl6TYSsuyJU0JONaq7x/9lCPNRnrXIrAb7/Y=";
+    rev = "6de0099784579adf44dc2503902e78e5a0e5b2d1";
+    sha256 = "sha256-6PXx6TUeCzNpoP76OnhLkHr86M9vNwB6rYOZEcSxHlM=";
   };
 
   wccPkg = pkgs.rustPlatform.buildRustPackage {
@@ -15,6 +15,20 @@ let
     src = wccSrc;
     cargoLock.lockFile = "${wccSrc}/Cargo.lock";
   };
+
+  # erc20RiskGateSrc = pkgs.fetchFromGitHub {
+  #   owner = "misssglory";
+  #   repo = "erc20-risk-gate";
+  #   rev = "b6cc51c5dcaf1a47951b55077df86477bf25981c";
+  #   sha256 = "sha256-/00lecZ19a3kJWtsSfyMrIMCsIihQTS0z2pTlU0Qp+U=";
+  # };
+
+  # erc20RiskGate = pkgs.rustPlatform.buildRustPackage {
+  #   pname = "erc20-risk-gate";
+  #   version = "0.1.0";
+  #   src = erc20RiskGateSrc;
+  #   cargoLock.lockFile = "${erc20RiskGateSrc}/Cargo.lock";
+  # };
 
   cliphistFuzzelRichSrc = pkgs.fetchFromGitHub {
     owner = "misssglory";
@@ -47,6 +61,9 @@ in
       "*.swp"
       ".DS_Store"
     ];
+    aliases = {
+      co = "checkout"; 
+    };
     extraConfig = {
       pull.rebase = "false";
       init.defaultBranch = "main";
@@ -195,6 +212,16 @@ in
     };
   };
 
+
+  # programs.vscode = {
+  #   enable = true;
+  #   extensions = with pkgs.vscode-extensions; [
+  #     dracula-theme.theme-dracula
+  #     vscodevim.vim
+  #     yzhang.markdown-all-in-one
+  #   ];
+  # };
+
   programs.zsh = {
     enable = true;
     enableCompletion = true;
@@ -275,7 +302,7 @@ in
     enable = true;
     settings = {
       window = {
-        opacity = 0.7;
+        opacity = 0.5;
         decorations = "full";
         dynamic_title = true;
       };
@@ -343,6 +370,7 @@ in
     cliphist
     mpv
     wccPkg
+    # erc20RiskGate
     cliphistFuzzelRich
     (pkgs.writeShellScriptBin "chromium-proxy" ''
       exec ${pkgs.ungoogled-chromium}/bin/chromium \
