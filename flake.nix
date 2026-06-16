@@ -2,11 +2,11 @@
   description = "NixOS";
 
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-25.11";
+    nixpkgs.url = "nixpkgs/nixos-26.05";
     nixpkgs-unstable.url = "nixpkgs/nixos-unstable";
 
     home-manager = {
-      url = "github:nix-community/home-manager/release-25.11";
+      url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -26,7 +26,7 @@
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
       unstable = nixpkgs-unstable.legacyPackages.${system};
-      wlroots = pkgs.wlroots_0_18;
+      wlroots = pkgs.wlroots_0_20;
     in {
       packages.${system} = {
         dwl = pkgs.callPackage ./dwl.nix {

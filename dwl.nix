@@ -18,7 +18,7 @@
 
 stdenv.mkDerivation {
   pname = "dwl";
-  version = "0.7";
+  version = "0.7-unstable-2026-05-06";  # Update version to reflect newer commit
   
   inherit src;
   
@@ -31,7 +31,7 @@ stdenv.mkDerivation {
   buildInputs = [
     wayland
     wayland-protocols
-    wlroots
+    wlroots  # Now uses wlroots 0.19+ from nixpkgs
     libinput
     libxkbcommon
     pixman
@@ -53,17 +53,14 @@ stdenv.mkDerivation {
       cp config.def.h config.h
     fi
     
-    # Create a symlink for wlroots-0.18.pc
-    mkdir -p fake-pkgconfig
-    if [ -f "${wlroots}/lib/pkgconfig/wlroots.pc" ]; then
-      ln -sf "${wlroots}/lib/pkgconfig/wlroots.pc" fake-pkgconfig/wlroots-0.18.pc
-    fi
+    # For wlroots 0.19+, the pkg-config name is just "wlroots"
+    # No need for wlroots-0.18.pc symlink anymore
     
-    # Set PKG_CONFIG_PATH to include all dependencies
-    export PKG_CONFIG_PATH="$PWD/fake-pkgconfig:${wlroots}/lib/pkgconfig:${xorg.libxcb}/lib/pkgconfig:${libxkbcommon}/lib/pkgconfig:${pixman}/lib/pkgconfig:$PKG_CONFIG_PATH"
+    # Set PKG_CONFIG_PATH
+    export PKG_CONFIG_PATH="${wlroots}/lib/pkgconfig:${xorg.libxcb}/lib/pkgconfig:${libxkbcommon}/lib/pkgconfig:${pixman}/lib/pkgconfig:$PKG_CONFIG_PATH"
     
     echo "=== Testing dependencies ==="
-    pkg-config --modversion wlroots-0.18 2>/dev/null || echo "wlroots-0.18 not found"
+    pkg-config --modversion wlroots 2>/dev/null || echo "wlroots not found"
     pkg-config --modversion pixman-1 2>/dev/null || echo "pixman-1 not found"
   '';
   
@@ -73,7 +70,6 @@ stdenv.mkDerivation {
     "XWAYLAND=-DXWAYLAND"
   ];
   
-  # Add include paths explicitly
   NIX_CFLAGS_COMPILE = [
     "-I${wlroots}/include"
     "-I${libinput}/include/libinput"
@@ -83,9 +79,10 @@ stdenv.mkDerivation {
   ];
   
   meta = with lib; {
-    description = "dwl with custom patches";
+    description = "dwl with custom patches (updated for wlroots 0.19+)";
     homepage = "https://github.com/djpohly/dwl";
     license = licenses.gpl3Only;
     platforms = platforms.linux;
+    # Add maintainer if needed
   };
 }
