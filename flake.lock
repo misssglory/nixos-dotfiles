@@ -3,17 +3,17 @@
     "dwl": {
       "flake": false,
       "locked": {
-        "lastModified": 1777464363,
-        "narHash": "sha256-G7bBe2uILDFzUnKwpKOZMEHUtqrxEWnH7rTvUNUzOdk=",
+        "lastModified": 1781596959,
+        "narHash": "sha256-4CKJyGaQyB9SKEK7GOhua96aV/6nkBsTb5d1UeX4fiI=",
         "owner": "misssglory",
         "repo": "dwl-setup",
-        "rev": "5d93ed64d446a38e8be689eb7ab7ecbcd5ffa192",
+        "rev": "21e5350d7823d5fbeaa8235dd5cc8ca081e8ac08",
         "type": "github"
       },
       "original": {
         "owner": "misssglory",
         "repo": "dwl-setup",
-        "rev": "5d93ed64d446a38e8be689eb7ab7ecbcd5ffa192",
+        "rev": "21e5350d7823d5fbeaa8235dd5cc8ca081e8ac08",
         "type": "github"
       }
     },

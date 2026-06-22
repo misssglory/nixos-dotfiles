@@ -11,7 +11,7 @@
     };
 
     dwl = {
-      url = "github:misssglory/dwl-setup/5d93ed64d446a38e8be689eb7ab7ecbcd5ffa192";
+      url = "github:misssglory/dwl-setup/21e5350d7823d5fbeaa8235dd5cc8ca081e8ac08";
       flake = false;
     };
 
