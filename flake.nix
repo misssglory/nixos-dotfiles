@@ -10,18 +10,13 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    dwl = {
-      url = "github:misssglory/dwl-setup/5d93ed64d446a38e8be689eb7ab7ecbcd5ffa192";
-      flake = false;
-    };
-
     sops-nix = {
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, home-manager, dwl, sops-nix, ... }:
+  outputs = { self, nixpkgs, nixpkgs-unstable, home-manager, sops-nix, ... }:
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
@@ -29,13 +24,6 @@
       wlroots = pkgs.wlroots_0_20;
     in {
       packages.${system} = {
-        dwl = pkgs.callPackage ./dwl.nix {
-          src = dwl;
-          inherit wlroots;
-          xorg = pkgs.xorg;
-          libxkbcommon = pkgs.libxkbcommon;
-          pixman = pkgs.pixman;
-        };
 
         spl-token-cli = pkgs.callPackage ./pkgs/spl-token-cli.nix {};
 
@@ -73,7 +61,6 @@
 
           {
             environment.systemPackages = with pkgs; [
-              self.packages.${system}.dwl
               self.packages.${system}.spl-token-cli
               pkg-config
               openssl

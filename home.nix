@@ -5,8 +5,8 @@ let
   wccSrc = pkgs.fetchFromGitHub {
     owner = "misssglory";
     repo = "wcc";
-    rev = "6de0099784579adf44dc2503902e78e5a0e5b2d1";
-    sha256 = "sha256-6PXx6TUeCzNpoP76OnhLkHr86M9vNwB6rYOZEcSxHlM=";
+    rev = "2ae68fb2b4b1dbfdcaf1dc89157086182bc16fb3";
+    sha256 = "sha256-fR2IcUFofHZJ5IkyZDn5J9XHReH/ExtbHGSLsWfE0mY=";
   };
 
   wccPkg = pkgs.rustPlatform.buildRustPackage {
@@ -71,6 +71,39 @@ in
   };
 
   services.ssh-agent.enable = true;
+
+  wayland.windowManager.hyprland = {
+    systemd.enable = false;
+    settings = {
+      decoration = {
+        shadow_offset = "0 5";
+        "col.shadow" = "rgba(00000099)";
+      };
+
+      "$mod" = "SUPER";
+
+      bind = [
+        # Execute Rofi with only the SUPER key
+        "$mod, Super_L, exec, pkill rofi || rofi -show drun"
+
+        "$mod, F, exec, librewolf"
+
+        "CONTROL ALT, T, exec, wezterm"
+      ];
+
+      # Startup Apps
+      exec-once = [
+        "hyprpanel"
+      ];
+
+      bindm = [
+        # mouse movements
+        "$mod, mouse:272, movewindow"
+        "$mod, mouse:273, resizewindow"
+        "$mod ALT, mouse:272, resizewindow"
+      ];
+    };
+  };
 
   home.shellAliases = {
     proxy-on = ''
@@ -271,7 +304,7 @@ in
       
       if [ -z "$WAYLAND_DISPLAY" ] && [ -z "$DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
         systemctl --user start graphical-session.target
-        exec dwl
+        # exec dwl
       fi
     '';
   };
@@ -280,13 +313,13 @@ in
     "$HOME/.local/bin"
   ];
 
-  home.file.".config/dwl/autostart.sh" = {
-    executable = true;
-    text = ''
-      #!/bin/bash
-      ${pkgs.dbus}/bin/dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=wlroots
-    '';
-  };
+  #home.file.".config/dwl/autostart.sh" = {
+  #  executable = true;
+  #  text = ''
+  #    #!/bin/bash
+  #    ${pkgs.dbus}/bin/dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=wlroots
+  #  '';
+  #};
 
   home.file.".config/waybar" = {
     source = pkgs.fetchFromGitHub {

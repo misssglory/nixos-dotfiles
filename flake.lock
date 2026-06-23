@@ -1,22 +1,5 @@
 {
   "nodes": {
-    "dwl": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1777464363,
-        "narHash": "sha256-G7bBe2uILDFzUnKwpKOZMEHUtqrxEWnH7rTvUNUzOdk=",
-        "owner": "misssglory",
-        "repo": "dwl-setup",
-        "rev": "5d93ed64d446a38e8be689eb7ab7ecbcd5ffa192",
-        "type": "github"
-      },
-      "original": {
-        "owner": "misssglory",
-        "repo": "dwl-setup",
-        "rev": "5d93ed64d446a38e8be689eb7ab7ecbcd5ffa192",
-        "type": "github"
-      }
-    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -70,7 +53,6 @@
     },
     "root": {
       "inputs": {
-        "dwl": "dwl",
         "home-manager": "home-manager",
         "nixpkgs": "nixpkgs",
         "nixpkgs-unstable": "nixpkgs-unstable",
