@@ -36,7 +36,37 @@
   #   keyMap = "us";
   #   useXkbConfig = true; # use xkb.options in tty.
   # };
-  programs.amnezia-vpn.enable = true;
+
+  # nixpkgs.overlays = [
+  #   (final: prev: {
+  #     amnezia-vpn = prev.amnezia-vpn.overrideAttrs (oldAttrs: rec {
+  #       version = "4.8.19.0";
+
+  #       src = final.fetchFromGitHub {
+  #         owner = "amnezia-vpn";
+  #         repo = "amnezia-client";
+  #         tag = version;
+  #         fetchSubmodules = true;
+  #         hash = "sha256-kftLofCyLA6DDfEXRPyy6Zx0JiQUEzpdYpTlvPihPZg=";
+  #       };
+
+  #       postPatch = ''
+  #         ${oldAttrs.postPatch or ""}
+
+  #         if grep -R "ApiPremV1MigrationDrawer" -n client/ui/qml; then
+  #           echo "Patching out ApiPremV1MigrationDrawer references..."
+  #           grep -RIl "ApiPremV1MigrationDrawer" client/ui/qml \
+  #             | xargs sed -i '/ApiPremV1MigrationDrawer[[:space:]]*{/,/^    }/d'
+  #         fi
+  #       '';
+  #     });
+  #   })
+  # ];
+
+  # programs.amnezia-vpn = {
+  #   enable = true;
+  #   package = pkgs.amnezia-vpn;
+  # };
 
   # X11 and Wayland setup
   # Enable X11 server for XWayland compatibility only
@@ -98,7 +128,7 @@
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.mg = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "video" "input" "seat" ]; # Add needed groups for Wayland
+    extraGroups = [ "wheel" "video" "input" "seat" "dialout" ]; # Add needed groups for Wayland
     packages = with pkgs; [
       tree
     ];
@@ -186,6 +216,8 @@
     xorg.libxcb
     xorg.xcbutilkeysyms
     xcb-util-cursor
+    arduino-cli
+    arduino-ide
   ];
 
   environment.etc."wireguard/wg0.conf" = {
