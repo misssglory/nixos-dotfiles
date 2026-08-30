@@ -6,7 +6,7 @@
     package = pkgs.postgresql;
 
     extensions = with pkgs.postgresql17Packages; [
-      timescaledb
+      # timescaledb
     ];
 
     ensureDatabases = [ "quotes" "tcp_router" ];
@@ -19,7 +19,7 @@
     ];
 
     settings = {
-      shared_preload_libraries = "timescaledb";
+      # shared_preload_libraries = "timescaledb";
       max_connections = 100;
       shared_buffers = "512MB";
       effective_cache_size = "2GB";

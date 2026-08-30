@@ -51,11 +51,32 @@
         "type": "indirect"
       }
     },
+    "ocr-text": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1787952092,
+        "narHash": "sha256-wppvQ12t6asu08Q9mmx4+u2voNz9CRoJxOAbS0YgGB8=",
+        "owner": "misssglory",
+        "repo": "ocr-test",
+        "rev": "cea850e276e4d6c54662ed6ed32b9475e60c317a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "misssglory",
+        "repo": "ocr-test",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "home-manager": "home-manager",
         "nixpkgs": "nixpkgs",
         "nixpkgs-unstable": "nixpkgs-unstable",
+        "ocr-text": "ocr-text",
         "sops-nix": "sops-nix"
       }
     },
