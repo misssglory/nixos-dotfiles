@@ -103,7 +103,7 @@
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.mg = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "video" "input" "seat" ]; # Add needed groups for Wayland
+    extraGroups = [ "wheel" "video" "input" "seat" "dialout" "networkmanager" ]; # Add needed groups for Wayland
     packages = with pkgs; [
       tree
     ];
@@ -191,6 +191,7 @@
     xorg.libxcb
     xorg.xcbutilkeysyms
     xcb-util-cursor
+    arduino
   ];
 
   environment.etc."wireguard/wg0.conf" = {
