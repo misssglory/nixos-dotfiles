@@ -191,8 +191,52 @@
     xorg.libxcb
     xorg.xcbutilkeysyms
     xcb-util-cursor
-    arduino
+    arduino-ide
   ];
+
+  hardware.bluetooth.enable = true;
+
+  virtualisation.oci-containers = {
+    backend = "podman";
+
+    containers.homeassistant = {
+      volumes = [
+        "home-assistant:/config"
+        "/run/dbus:/run/dbus:ro"
+      ];
+
+      environment.TZ = "Europe/Berlin";
+
+      image = "ghcr.io/home-assistant/home-assistant:stable";
+
+      extraOptions = [
+        "--network=host"
+
+        "--cap-add=NET_ADMIN"
+        "--cap-add=NET_RAW"
+
+        # "--device=/dev/ttyACM0:/dev/ttyACM0"
+      ];
+    };
+  };
+
+  services.mosquitto = {
+    enable = true;
+
+    listeners = [
+      {
+        port = 1883;
+        address = "0.0.0.0";
+
+        users = {
+          mqtt = {
+            password = "CHANGE_THIS_PASSWORD";
+            acl = [ "readwrite #" ];
+          };
+        };
+      }
+    ];
+  };
 
   environment.etc."wireguard/wg0.conf" = {
     # IMPORTANT: Create a 'wireguard' folder in the same directory as your configuration.nix
