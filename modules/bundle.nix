@@ -1,13 +1,12 @@
-# modules/bundle.nix
 { config, lib, pkgs, ... }:
 
 let
-  # Check if we should enable telegram features
-  # You can also check for file existence
   enableTelegram = builtins.pathExists ./telegram-enabled;
 in
 {
-  imports = lib.optionals enableTelegram [
+  imports = [
+    ./token-info-server.nix
+  ] ++ lib.optionals enableTelegram [
     ./sops.nix
     ./rex.nix
   ];
