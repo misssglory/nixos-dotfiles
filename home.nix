@@ -53,10 +53,10 @@ let
         "cliphist-fuzzel-rich-rs";
 
       rev =
-        "a082ac1fac734686deba2f196772cad002641ffc";
+        "a1919ace41064d7f45b3f7faeaab1061dccef4d0";
 
       sha256 =
-        "sha256-dSpu1omnx+Y3vylLiAf1ZLuiVJxJQoIhcKaQZB/aXd8=";
+        "sha256-Abi2CnWUTZwpOIwcM2kfR5FTbqlVrooBYSv4EjKb2js=";
     };
 
   cliphistFuzzelRich =
@@ -123,75 +123,6 @@ in
     source = ./config/hypr/hyprland.conf;
     force = true;
   };
-  # wayland.windowManager.hyprland = {
-  #   systemd.enable =
-  #     false;
-
-  #   settings = {
-  #     decoration = {
-  #       shadow_offset =
-  #         "0 5";
-
-  #       "col.shadow" =
-  #         "rgba(00000099)";
-  #     };
-
-  #     "$mod" =
-  #       "SUPER";
-
-  #     bind = [
-  #       #
-  #       # Execute Rofi with only SUPER.
-  #       #
-  #       "$mod, Super_L, exec, pkill rofi || rofi -show drun"
-
-  #       "$mod, F, exec, librewolf"
-
-  #       "CONTROL ALT, T, exec, wezterm"
-
-  #       #
-  #       # Region screenshot:
-  #       #
-  #       # SUPER + SHIFT + S
-  #       #
-  #       # 1. slurp
-  #       # 2. grim
-  #       # 3. save PNG
-  #       # 4. copy PNG to clipboard
-  #       # 5. asynchronous Tesseract OCR
-  #       # 6. notify lines/words/chars
-  #       #
-  #       "$mod SHIFT, S, exec, ${ocrTextScreenshot}/bin/screenshot-ocr"
-  #     ];
-
-  #     #
-  #     # Startup Apps
-  #     #
-  #     exec-once = [
-  #       "hyprpanel"
-
-  #       #
-  #       # Pass the active Hyprland/Wayland environment
-  #       # to systemd --user and DBus activated services.
-  #       #
-  #       # Then restart OCR sender so xcap can see
-  #       # the current graphical session.
-  #       #
-  #       "${pkgs.bash}/bin/bash -lc '${pkgs.systemd}/bin/systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE HYPRLAND_INSTANCE_SIGNATURE; ${pkgs.dbus}/bin/dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE HYPRLAND_INSTANCE_SIGNATURE; ${pkgs.systemd}/bin/systemctl --user restart screen-ocr-sender.service'"
-  #     ];
-
-  #     bindm = [
-  #       #
-  #       # Mouse movements
-  #       #
-  #       "$mod, mouse:272, movewindow"
-
-  #       "$mod, mouse:273, resizewindow"
-
-  #       "$mod ALT, mouse:272, resizewindow"
-  #     ];
-  #   };
-  # };
 
   home.shellAliases = {
     proxy-on = ''
@@ -791,6 +722,12 @@ in
     source =
       "${cliphistFuzzelRichSrc}/fuzzel.ini";
   };
+
+  xdg.configFile."cliphist/config" = {
+    source = ./config/cliphist/config;
+    force = true;
+  };
+
 
   xdg.desktopEntries = {
     ungoogled-chromium-proxy = {

@@ -1,0 +1,12 @@
+# Maximum number of clipboard entries
+max-items 20000
+
+# Search the entire history for duplicates
+# Copying an existing item moves it to the newest position
+max-dedupe-search 20000
+
+# Maximum size of a single clipboard item
+max-store-size 500MiB
+
+# Width of clipboard previews
+preview-width 120
