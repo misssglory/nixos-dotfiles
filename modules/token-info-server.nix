@@ -1,48 +1,77 @@
-{ config, lib, pkgs, inputs, ... }:
+{ config, pkgs, lib, inputs, ... }:
 
 let
-  tokenInfoHost = "127.0.0.1";
-  tokenInfoPort = 9002;
+  host = "127.0.0.1";
+  port = 9002;
 
-  tokenInfoAddress =
-    "${tokenInfoHost}:${toString tokenInfoPort}";
+  address = "${host}:${toString port}";
 
-  serverPackage =
+  package =
     inputs.token-info-server.packages.${pkgs.stdenv.hostPlatform.system}.default;
 in
 {
-  # Available to user sessions and programs
   environment.variables = {
-    TOKEN_INFO_SERVER_ADDR = tokenInfoAddress;
+    TOKEN_INFO_SERVER_ADDR = address;
   };
 
   systemd.services.token-info-server = {
     description = "Token Info Server";
 
-    wantedBy = [ "multi-user.target" ];
-    after = [ "network-online.target" ];
-    wants = [ "network-online.target" ];
+    wantedBy = [
+      "multi-user.target"
+    ];
+
+    after = [
+      "network-online.target"
+      "postgresql.service"
+      "sops-nix.service"
+    ];
+
+    wants = [
+      "network-online.target"
+    ];
+
+    requires = [
+      "postgresql.service"
+    ];
 
     environment = {
-      HOST = tokenInfoHost;
-      PORT = toString tokenInfoPort;
-
       RUST_LOG = "info";
 
-      # Keep your existing database/RPC settings here.
+      HOST = host;
+      PORT = toString port;
+
+      TOKEN_INFO_SERVER_ADDR = address;
+
+      TCP_ENDPOINT_ENABLED = "false";
+
+      ROBINHOOD_RPC =
+        "https://rpc.mainnet.chain.robinhood.com";
     };
 
     serviceConfig = {
       Type = "simple";
+
       User = "mg";
       Group = "users";
 
+      WorkingDirectory = "/home/mg";
+
       ExecStart = ''
-        ${lib.getExe serverPackage} --config /dev/null
+        ${lib.getExe package} \
+          --config /dev/null \
+          --host ${host} \
+          --port ${toString port}
       '';
 
+      EnvironmentFile =
+        config.sops.secrets."token-info-server/env".path;
+
       Restart = "always";
-      RestartSec = "2s";
+      RestartSec = 2;
+
+      NoNewPrivileges = true;
+      PrivateTmp = true;
     };
   };
 }

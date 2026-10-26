@@ -1,15 +1,17 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, ... }:
 
 let
   enableTelegram = builtins.pathExists ./telegram-enabled;
 in
 {
-  imports = [
-    ./token-info-server.nix
-  ] ++ lib.optionals enableTelegram [
-    ./sops.nix
-    ./rex.nix
-  ];
+  imports =
+    [
+      ./sops.nix
+      ./token-info-server.nix
+    ]
+    ++ lib.optionals enableTelegram [
+      ./rex.nix
+    ];
 
   config = lib.mkIf enableTelegram {
     services.rex = {

@@ -142,11 +142,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1792451815,
-        "narHash": "sha256-5AhRZgmQqUbe+1ErtTTtxW0OMVzIhK2GronhtRqHa1o=",
+        "lastModified": 1792628964,
+        "narHash": "sha256-uihCTj2iueB2FeuFYeK1XtePcTyVzt9Ak3NA6QBGuYI=",
         "owner": "misssglory",
         "repo": "token-info-server",
-        "rev": "536e3866521f487d14370d422bbc0200ad020d28",
+        "rev": "32bc2841f6e6c2faf97f07ebcfb57010ad70cf83",
         "type": "github"
       },
       "original": {

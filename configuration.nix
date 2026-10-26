@@ -2,7 +2,7 @@
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, unstable, ... }:
 
 {
   imports =
@@ -41,7 +41,16 @@
   #   keyMap = "us";
   #   useXkbConfig = true; # use xkb.options in tty.
   # };
-  programs.amnezia-vpn.enable = true;
+  # programs.amnezia-vpn = {
+  #   enable = true;
+  #   package = unstable.amnezia-vpn;
+  # };
+
+  # # Additional runtime utilities needed by newer AmneziaVPN
+  # systemd.services."AmneziaVPN".path = with pkgs; [
+  #   gawk
+  #   iptables
+  # ];
 
   # X11 and Wayland setup
   # Enable X11 server for XWayland compatibility only
