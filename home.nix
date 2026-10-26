@@ -472,22 +472,7 @@ in
       export CLUTTER_BACKEND=wayland
       export _JAVA_AWT_WM_NONREPARENTING=1
 
-      # if [ -z "$WAYLAND_DISPLAY" ] && [ -z "$DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
-      #   systemctl --user start graphical-session.target
-
-      #   # exec dwl
-      # fi
-      hstart() {
-        "$HOME/.local/bin/hydra-zellij" start
-      }
-
-      hreset() {
-        "$HOME/.local/bin/hydra-zellij" "''${1:-reset}"
-      }
-
-      hstatus() {
-        "$HOME/.local/bin/hydra-zellij" status
-      }
+      source ${./scripts/hydra-zellij.zsh}
     '';
   };
 
@@ -710,6 +695,7 @@ in
   home.file.".local/bin/hydra-zellij" = {
     source = ./scripts/hydra-zellij.sh;
     executable = true;
+    force = true;
   };
 
   home.file.".local/bin/xray-proxy" = {
