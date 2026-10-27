@@ -8,6 +8,9 @@ in
     [
       ./sops.nix
       ./token-info-server.nix
+      # ./chatgpt-ctl.nix
+      ./hermes.nix
+      ./llama-vulkan.nix
     ]
     ++ lib.optionals enableTelegram [
       ./rex.nix

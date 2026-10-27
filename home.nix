@@ -1,4 +1,4 @@
-{ config, pkgs, unstable, ocr-text, ... }:
+{ config, pkgs, unstable, ocr-text, chatgpt-ctl, wcc, hermes-agent, ... }:
 
 let
   system =
@@ -7,29 +7,32 @@ let
   ocrTextScreenshot =
     ocr-text.packages.${system}.screenshot-ocr;
 
-  wccSrc = pkgs.fetchFromGitHub {
-    owner = "misssglory";
+  chatgptCtl = chatgpt-ctl.packages.${system}.chatgpt-ctl;
 
-    repo = "wcc";
+  wccPkg = wcc.packages.${pkgs.stdenv.hostPlatform.system}.wcc;
+  # wccSrc = pkgs.fetchFromGitHub {
+  #   owner = "misssglory";
 
-    rev =
-      "2ae68fb2b4b1dbfdcaf1dc89157086182bc16fb3";
+  #   repo = "wcc";
 
-    sha256 =
-      "sha256-fR2IcUFofHZJ5IkyZDn5J9XHReH/ExtbHGSLsWfE0mY=";
-  };
+  #   rev =
+  #     "2ae68fb2b4b1dbfdcaf1dc89157086182bc16fb3";
 
-  wccPkg =
-    pkgs.rustPlatform.buildRustPackage {
-      pname = "wcc";
+  #   sha256 =
+  #     "sha256-fR2IcUFofHZJ5IkyZDn5J9XHReH/ExtbHGSLsWfE0mY=";
+  # };
 
-      version = "0.1.0";
+  # wccPkg =
+  #   pkgs.rustPlatform.buildRustPackage {
+  #     pname = "wcc";
 
-      src = wccSrc;
+  #     version = "0.1.0";
 
-      cargoLock.lockFile =
-        "${wccSrc}/Cargo.lock";
-    };
+  #     src = wccSrc;
+
+  #     cargoLock.lockFile =
+  #       "${wccSrc}/Cargo.lock";
+  #   };
 
   # erc20RiskGateSrc = pkgs.fetchFromGitHub {
   #   owner = "misssglory";
@@ -623,41 +626,25 @@ in
       # OCR screenshot command from GitHub.
       #
       ocrTextScreenshot
-
       wl-clipboard
-
       grim
-
       slurp
-
       wmenu
-
       wlsunset
-
       pavucontrol
-
       networkmanagerapplet
-
       libnotify
-
       mako
-
       waybar
-
       foot
-
       swappy
-
       cliphist
-
       mpv
-
       wccPkg
-
       # erc20RiskGate
-
       cliphistFuzzelRich
-
+      chatgptCtl
+      hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default
       (
         pkgs.writeShellScriptBin
           "chromium-proxy"
@@ -669,7 +656,6 @@ in
               "$@"
           ''
       )
-
       (
         pkgs.writeShellScriptBin
           "chromium-regular"
@@ -682,14 +668,23 @@ in
       )
     ];
 
-  programs.zed-editor = {
-    enable =
-      true;
+  # programs.zed-editor = {
+  #   enable =
+  #     true;
 
-    package =
-      unstable.zed-editor;
+  #   package =
+  #     unstable.zed-editor;
 
-    # settings = { ... };
+  #   # settings = { ... };
+  # };
+  home.sessionVariables = {
+    CHATGPT_DATABASE_URL = "postgres://chatgpt:chatgpt@127.0.0.1:5432/chatgpt_history";
+    HERMES_HOME = "/home/mg/.hermes";
+  };
+
+  # Optional: explicit zsh completion (package already ships share/zsh/site-functions)
+  xdg.dataFile."zsh/site-functions/_chatgpt-ctl" = {
+    source = "${chatgptCtl}/share/zsh/site-functions/_chatgpt-ctl";
   };
 
   home.file.".local/bin/hydra-zellij" = {
