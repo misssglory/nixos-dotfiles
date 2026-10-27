@@ -38,11 +38,12 @@ in
         "${llama}/bin/llama-server"
 
         "-hf" model
+        "--no-mmproj"
 
         "--host" "127.0.0.1"
         "--port" "18080"
 
-        "--ctx-size" "32768"
+        "--ctx-size" "65000"
         "--n-gpu-layers" "99"
 
         "--alias" "gemma4-12b"
